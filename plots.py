@@ -183,11 +183,11 @@ def runplots(feature, showfliersvalue, notchvalue):
 # plot the delay
 ##plot.figure(1)
 #(feature, outliers or not, notch or not)
-runplots('delay', 0, 1)
+#runplots('delay', 0, 1)
 # TOdo
 # Process real data from first trials in mobile
 # Do Two plts in one figure
 
-plot.show()  # to keep the figures alive
+#plot.show()  # to keep the figures alive
 
 # plot.savefig('delays.png', dpi=300)
