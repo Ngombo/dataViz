@@ -1,7 +1,6 @@
 import pandas
 import numpy
 import matplotlib.pyplot as plot
-import seaborn as sns
 from matplotlib.patches import Polygon
 from floader import load
 
@@ -9,18 +8,14 @@ from floader import load
 
 # Load the datasets
 df1 = pandas.DataFrame(load('mobileidaslwm2m', '1', 'lwm2m'))
-# df1 =pandas.DataFrame(load('mobileorion', '1', ' '))
-df2 = pandas.DataFrame(load('mobileidaslwm2m', '2', 'lwm2m'))
-# df2 = pandas.DataFrame(load('mobileorion', '2', ' '))
-df3 = pandas.DataFrame(load('mobileidaslwm2m', '3', 'lwm2m'))
-# df3 = pandas.DataFrame(load('mobileorion', '3', 'lwm2m'))
-df4 = pandas.DataFrame(load('mobileidaslwm2m', '1', 'lwm2m'))
-# df4 = pandas.DataFrame(load('mobileorion', '4', ' '))
-df5 = pandas.DataFrame(load('mobileidaslwm2m', '2', 'lwm2m'))
-# df5 = pandas.DataFrame(load('mobileorion', '5', ' '))
-df6 = pandas.DataFrame(load('mobileidaslwm2m', '3', 'lwm2m'))
+df2 = pandas.DataFrame(load('mobileorion', '1', 'json'))
+df3 = pandas.DataFrame(load('mobileidaslwm2m', '2', 'lwm2m'))
+df4 = pandas.DataFrame(load('mobileorion', '2', 'json'))
+df5 = pandas.DataFrame(load('mobileidaslwm2m', '3', 'lwm2m'))
+df6 = pandas.DataFrame(load('mobileorion', '3', 'json'))
 
 
+# print df1
 # df6 = pandas.DataFrame(load('mobileorion', '6', ' '))
 
 # Main function
@@ -52,9 +47,9 @@ def runplots(feature, outliers):
 
     # Add a basic legend
     if outliers == '0':
-        axis.set_title('No Outliers ' + ' ' + feature.title() + ' Distribution')
+        axis.set_title('No-Outliers ' + feature.title() + ' Distribution')
     if outliers == '1':
-        axis.set_title('Full ' + ' ' + feature.title() + ' Distribution')
+        axis.set_title('Full ' + feature.title() + ' Distribution')
     axis.set_xlabel('Trials')
 
     if feature == 'length':
@@ -118,10 +113,10 @@ def runplots(feature, outliers):
                       weight='bold', color=box_colors[k])
 
     # Finally, add a basic legend
-    figures.text(0.80, 0.13, 'lwm2m/udp',
+    figures.text(0.80, 0.13, 'lwm2m/coap/udp',
                  backgroundcolor=box_colors[0], color='white', weight='roman',
                  size='x-small')
-    figures.text(0.80, 0.1, 'http/tcp',
+    figures.text(0.80, 0.1, 'json/http/tcp',
                  backgroundcolor=box_colors[1],
                  color='white', weight='roman', size='x-small')
     if outliers == "1":
@@ -183,8 +178,8 @@ def runplots(feature, outliers):
 
 # plot the delay
 ##plot.figure(1)
-runplots('delay', '0')
-#TOdo
+runplots('length', '0')
+# TOdo
 # Process real data from first trials in mobile
 # Do Two plts in one figure
 
