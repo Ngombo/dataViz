@@ -184,6 +184,9 @@ def runplots(feature, outliers):
 # plot the delay
 ##plot.figure(1)
 runplots('delay', '0')
+#TOdo
+# Process real data from first trials in mobile
+# Do Two plts in one figure
 
 plot.show()  # to keep the figures alive
 
