@@ -21,7 +21,7 @@ def runfilter(dataset, trial, protocol):
         df.rename(columns={'Time since previous frame': 'delay'}, inplace=True)
         df.rename(columns={'Length': 'length'}, inplace=True)
         df = formatting(df, trial)
-        # return df
+
     if protocol == 'json':
         df = pandas.read_csv(dataset, usecols=['Length', 'Time since previous frame in this TCP stream',
                                                'Request Method', 'This frame is a (suspected) retransmission'])

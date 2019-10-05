@@ -2,9 +2,16 @@ import pandas
 import numpy
 import matplotlib.pyplot as plot
 from matplotlib.patches import Polygon
-from floader import load
+from filtering import runfilter
+
 
 ## adapted from https://matplotlib.org/3.1.1/gallery/statistics/boxplot_demo.html
+
+# Create DF sets, where to load the prepared dataFrame by the helper method
+def load(traffic, trial, protocol):
+    df = pandas.DataFrame(runfilter('C:/Users/X260/Desktop/raw/' + trial + '-' + traffic + '.csv', trial, protocol))
+    return df
+
 
 # Load the datasets
 df1 = pandas.DataFrame(load('mobileidaslwm2m', '1', 'lwm2m'))
@@ -19,7 +26,7 @@ df6 = pandas.DataFrame(load('mobileorion', '3', 'json'))
 # df6 = pandas.DataFrame(load('mobileorion', '6', ' '))
 
 # Main function
-def runplots(feature, outliers):
+def runplots(feature, showfliersvalue, notchvalue):
     datasets = [df1[feature], df2[feature], df3[feature], df4[feature], df5[feature], df6[feature]]
     trials = [1, 2, 3]
     box_colors = ['green', 'firebrick', 'black', 'lightgrey']
@@ -27,12 +34,9 @@ def runplots(feature, outliers):
     # Subplots Sharing the same X Axis
     figures, axis = plot.subplots(figsize=(10, 6))
     figures.subplots_adjust(left=0.075, right=0.95, top=0.9, bottom=0.25)
-    if outliers == '0':
-        boxplot = axis.boxplot(datasets, notch=1, showfliers=0, sym='o', vert=1, whis=1.5)
 
-    if outliers == "1":  # showfliers=True or 1
-        boxplot = axis.boxplot(datasets, notch=1, showfliers=1, sym='o', vert=1, whis=1.5)
-    print boxplot
+    boxplot = axis.boxplot(datasets, notch=notchvalue, showfliers=showfliersvalue, sym='o', vert=1, whis=1.5)
+
 
     # Customize the characteristics of the boxplot
     plot.setp(boxplot['boxes'], color=box_colors[2])
@@ -46,9 +50,9 @@ def runplots(feature, outliers):
     axis.set_axisbelow(True)
 
     # Add a basic legend
-    if outliers == '0':
+    if showfliersvalue == 0:
         axis.set_title('No-Outliers ' + feature.title() + ' Distribution')
-    if outliers == '1':
+    if showfliersvalue == 1:
         axis.set_title('Full ' + feature.title() + ' Distribution')
     axis.set_xlabel('Trials')
 
@@ -89,7 +93,7 @@ def runplots(feature, outliers):
         # in the center of each box, for the case I want to see the outliers
         # It is a way to have a zoom on the interquartilespace
 
-        if outliers == "1":
+        if showfliersvalue == 1:
             axis.plot(numpy.average(med.get_xdata()), numpy.average(datasets[i]),
                       color=box_colors[3], marker='x', markeredgewidth=2, markersize=20, markeredgecolor='k')
 
@@ -101,7 +105,7 @@ def runplots(feature, outliers):
     # X-axis tick labels with the sample means to aid in comparison
     # (just use two decimal places of precision)
     # Only for the plot with outliers, because we will plot two charts in one space
-    if outliers == '1':
+    if showfliersvalue == 1:
         pos = numpy.arange(num_boxes) + 1
         # upper_labels = [str(numpy.round(s, 2)) for s in medians]
         upper_labels = [str(numpy.round(s, 2)) for s in means]
@@ -119,7 +123,7 @@ def runplots(feature, outliers):
     figures.text(0.80, 0.1, 'json/http/tcp',
                  backgroundcolor=box_colors[1],
                  color='white', weight='roman', size='x-small')
-    if outliers == "1":
+    if showfliersvalue == 1:
         figures.text(0.80, 0.05, '00.00', color='black', weight='roman', size='medium')
         figures.text(0.85, 0.05, 'Means Values', color='black', weight='roman',
                      size='x-small')
@@ -178,7 +182,8 @@ def runplots(feature, outliers):
 
 # plot the delay
 ##plot.figure(1)
-runplots('length', '0')
+#(feature, outliers or not, notch or not)
+runplots('delay', 0, 1)
 # TOdo
 # Process real data from first trials in mobile
 # Do Two plts in one figure
