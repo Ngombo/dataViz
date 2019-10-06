@@ -3,6 +3,7 @@ import numpy
 import matplotlib.pyplot as plot
 from matplotlib.patches import Polygon
 from filtering import runfilter
+from scipy import stats
 
 
 ## adapted from https://matplotlib.org/3.1.1/gallery/statistics/boxplot_demo.html
@@ -27,11 +28,25 @@ df10 = pandas.DataFrame(load('mobileorion', '5', 'json'))
 df11 = pandas.DataFrame(load('mobileidaslwm2m', '6', 'lwm2m'))
 df12 = pandas.DataFrame(load('mobileorion', '6', 'json'))
 
+stats_df = pandas.DataFrame()
 
-# Main function
-def runplots(feature, showfliersvalue, notchvalue):
+
+# Main function to run the plots and tha charts
+def showresults(feature, showfliersvalue, notchvalue):
+    # num_trials = 6
+    # df = pandas.DataFrame()
+    # datasets = numpy.empty(num_trials*2)  # Return a new array of given shape without initializing entries.
+    # for i in range(1, num_trials+1):
+    #     if i % 2 == 0:
+    #         datasets[i-1] = df(load('mobileorion', str(i), 'json'))
+    #     else:
+    #         datasets[i-1] = df(load('mobileidaslwm2m', str(i), 'lwm2m'))
+
     datasets = [df1[feature], df2[feature], df3[feature], df4[feature], df5[feature], df6[feature],
                 df7[feature], df8[feature], df9[feature], df10[feature], df11[feature], df12[feature]]
+
+    # Array with the number of readings counted by trial
+    sentReadings = [3210, 3236, 684, 690, 339, 341, 3221, 3319, 683, 872, 335, 368]
 
     # Return evenly spaced values within a given interval.
     trials = numpy.arange(1, 7)
@@ -100,10 +115,32 @@ def runplots(feature, showfliersvalue, notchvalue):
         # Finally, overplot the sample averages, with horizontal alignment
         # in the center of each box, for the case I want to see the outliers
         # It is a way to have a zoom on the interquartilespace
-
         if showfliersvalue == 1:
-            axis.plot(numpy.average(med.get_xdata()), numpy.average(datasets[i]),
+            axis.plot(numpy.average(med.get_xdata()), means[i],
                       color=box_colors[3], marker='x', markeredgewidth=2, markersize=20, markeredgecolor='k')
+
+        # Stats
+        sentframes = sentReadings[i]
+        receivedframes = datasets[i].count()
+        frameloss = numpy.round((1 - (receivedframes / float(sentframes))) * 100, 2)
+        mean = numpy.round(means[i], 2)
+        median = numpy.round(medians[i], 2)
+        mode = stats.mode(datasets[i])
+        # mode = datasets[i].mode()
+        # print datasets[i].mode(self, dropna=True)
+
+        print '\nStats for df' + str(i) + ' => ' + feature
+        print 'Sent Frames: ' + str(sentframes)
+        print 'Received Frames: ' + str(receivedframes)
+        print 'Frame Loss: ' + str(frameloss)
+        print 'mean: ' + str(mean)
+        print 'median: ' + str(median)
+        print 'mode: ' + str(mode)
+
+        # Insert the results as new column to a stats data Frame
+        # index = i
+        # column = [sentframes, receivedframes, frameloss, means, medians, mode]
+        # stats_df.insert(loc=index, column='df' + str(i) + ' ' + feature, value=column)
 
     # Set the axes labels
     axis.set_xticklabels(numpy.repeat(trials, 2), rotation=45, fontsize=8)
@@ -113,6 +150,22 @@ def runplots(feature, showfliersvalue, notchvalue):
     # X-axis tick labels with the sample means to aid in comparison
     # (just use two decimal places of precision)
     # Only for the plot with outliers, because we will plot two charts in one space
+    if showfliersvalue == 0:
+        pos = numpy.arange(num_boxes) + 1
+        # upper_labels = [str(numpy.round(s, 2)) for s in medians]
+        upper_labels = [str(numpy.round(s, 2)) for s in medians]
+        for tick, label in zip(range(num_boxes), axis.get_xticklabels()):
+            k = tick % 2
+            axis.text(pos[tick], .95, upper_labels[tick],
+                      transform=axis.get_xaxis_transform(),
+                      horizontalalignment='center', size='large',
+                      weight='bold', color=box_colors[k])
+
+        # Finally, add a basic legend for medians
+        figures.text(0.80, 0.05, '00.00', color='black', weight='roman', size='medium')
+        figures.text(0.85, 0.05, 'Medians Values', color='black', weight='roman',
+                     size='x-small')
+
     if showfliersvalue == 1:
         pos = numpy.arange(num_boxes) + 1
         # upper_labels = [str(numpy.round(s, 2)) for s in medians]
@@ -124,20 +177,26 @@ def runplots(feature, showfliersvalue, notchvalue):
                       horizontalalignment='center', size='large',
                       weight='bold', color=box_colors[k])
 
-    # Finally, add a basic legend
-    figures.text(0.80, 0.13, 'lwm2m / coap / udp',
-                 backgroundcolor=box_colors[0], color='white', weight='roman',
-                 size='x-small')
-    figures.text(0.80, 0.1, 'json / http / tcp',
-                 backgroundcolor=box_colors[1],
-                 color='white', weight='roman', size='x-small')
-    if showfliersvalue == 1:
+        # Finally, add a basic legend for means
         figures.text(0.80, 0.05, '00.00', color='black', weight='roman', size='medium')
         figures.text(0.85, 0.05, 'Means Values', color='black', weight='roman',
                      size='x-small')
         figures.text(0.80, 0.026, 'x', color='black', weight='roman', size='large')
         figures.text(0.815, 0.026, 'Means Positions', color='black', weight='roman',
                      size='x-small')
+
+    # Finally, add a general legend
+    figures.text(0.80, 0.13, 'lwm2m / coap / udp',
+                 backgroundcolor=box_colors[0], color='white', weight='roman',
+                 size='x-small')
+    figures.text(0.80, 0.1, 'json / http / tcp',
+                 backgroundcolor=box_colors[1],
+                 color='white', weight='roman', size='x-small')
+
+# Store the stats a csv or further processing if needed
+# path = 'C:\Users\X260\Desktop'
+# path = 'C:\Users\X260\OneDrive\Documents\UC\_LCT\GeneralHands-on\LwM2M'
+# stats_df.to_csv(path + "out.csv", index=False)
 
 # def fillcolor(datasets, boxplot, axis, color1, color2):
 
