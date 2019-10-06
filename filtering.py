@@ -4,14 +4,13 @@ import pandas
 # Format the values of the dataset
 def formatting(df, trial):
     # Eliminate the Source SamplingFrequency and transform the values into milliseconds
-    if trial == '1':
+    if trial == '1' or trial == '4':
         df['delay'] = (df['delay'] - 1) * 1000
-    elif trial == '2':
+    elif trial == '2' or trial == '5':
         df['delay'] = (df['delay'] - 5) * 1000
-    elif trial == '3':
+    elif trial == '3' or trial == '6':
         df['delay'] = (df['delay'] - 10) * 1000
     return df
-
 
 # Eliminate the unnecessary data
 def runfilter(dataset, trial, protocol):

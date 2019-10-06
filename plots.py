@@ -20,15 +20,24 @@ df3 = pandas.DataFrame(load('mobileidaslwm2m', '2', 'lwm2m'))
 df4 = pandas.DataFrame(load('mobileorion', '2', 'json'))
 df5 = pandas.DataFrame(load('mobileidaslwm2m', '3', 'lwm2m'))
 df6 = pandas.DataFrame(load('mobileorion', '3', 'json'))
+df7 = pandas.DataFrame(load('mobileidaslwm2m', '4', 'lwm2m'))
+df8 = pandas.DataFrame(load('mobileorion', '4', 'json'))
+df9 = pandas.DataFrame(load('mobileidaslwm2m', '5', 'lwm2m'))
+df10 = pandas.DataFrame(load('mobileorion', '5', 'json'))
+df11 = pandas.DataFrame(load('mobileidaslwm2m', '6', 'lwm2m'))
+df12 = pandas.DataFrame(load('mobileorion', '6', 'json'))
 
-
-# print df1
-# df6 = pandas.DataFrame(load('mobileorion', '6', ' '))
 
 # Main function
 def runplots(feature, showfliersvalue, notchvalue):
-    datasets = [df1[feature], df2[feature], df3[feature], df4[feature], df5[feature], df6[feature]]
-    trials = [1, 2, 3]
+    datasets = [df1[feature], df2[feature], df3[feature], df4[feature], df5[feature], df6[feature],
+                df7[feature], df8[feature], df9[feature], df10[feature], df11[feature], df12[feature]]
+
+    # Return evenly spaced values within a given interval.
+    trials = numpy.arange(1, 7)
+    # for i in range(trials*2):
+    #     datasets = numpy.empty('df'+i+'[feature]')
+
     box_colors = ['green', 'firebrick', 'black', 'lightgrey']
 
     # Subplots Sharing the same X Axis
@@ -36,7 +45,6 @@ def runplots(feature, showfliersvalue, notchvalue):
     figures.subplots_adjust(left=0.075, right=0.95, top=0.9, bottom=0.25)
 
     boxplot = axis.boxplot(datasets, notch=notchvalue, showfliers=showfliersvalue, sym='o', vert=1, whis=1.5)
-
 
     # Customize the characteristics of the boxplot
     plot.setp(boxplot['boxes'], color=box_colors[2])
@@ -117,10 +125,10 @@ def runplots(feature, showfliersvalue, notchvalue):
                       weight='bold', color=box_colors[k])
 
     # Finally, add a basic legend
-    figures.text(0.80, 0.13, 'lwm2m/coap/udp',
+    figures.text(0.80, 0.13, 'lwm2m / coap / udp',
                  backgroundcolor=box_colors[0], color='white', weight='roman',
                  size='x-small')
-    figures.text(0.80, 0.1, 'json/http/tcp',
+    figures.text(0.80, 0.1, 'json / http / tcp',
                  backgroundcolor=box_colors[1],
                  color='white', weight='roman', size='x-small')
     if showfliersvalue == 1:
@@ -130,7 +138,6 @@ def runplots(feature, showfliersvalue, notchvalue):
         figures.text(0.80, 0.026, 'x', color='black', weight='roman', size='large')
         figures.text(0.815, 0.026, 'Means Positions', color='black', weight='roman',
                      size='x-small')
-
 
 # def fillcolor(datasets, boxplot, axis, color1, color2):
 
@@ -172,22 +179,5 @@ def runplots(feature, showfliersvalue, notchvalue):
 ##above.yaxis.grid(True, linestyle='-', which='major', color=box_colors[3], alpha=0.5)
 ## below.yaxis.grid(True, linestyle='-', which='major', color=box_colors[3], alpha=0.5)
 
-# Now fill the boxes with desired colors
-##fillcolor(datasets, boxplot_above, above, box_colors[0], box_colors[1])
-## fillcolor(datasets, boxplot_below, below, box_colors[0], box_colors[1])
 
-# plot the length chart
-# runplots('length', 'Bytes')
-# plot.savefig('length.png', dpi=300)
-
-# plot the delay
-##plot.figure(1)
-#(feature, outliers or not, notch or not)
-#runplots('delay', 0, 1)
-# TOdo
-# Process real data from first trials in mobile
-# Do Two plts in one figure
-
-#plot.show()  # to keep the figures alive
-
-# plot.savefig('delays.png', dpi=300)
+# TOdo - Do Two plts in one figure
