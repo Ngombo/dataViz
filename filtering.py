@@ -24,6 +24,7 @@ def runfilter(dataset, trial, protocol):
     df = pandas.DataFrame()
     if protocol == 'lwm2m':
         df = pandas.read_csv(dataset, usecols=['Length', 'Time since previous frame', 'Code', 'Type'])
+        #df = pandas.read_json(dataset, usecols=['Length', 'Time since previous frame', 'Code', 'Type'])
         df.rename(columns={'Time since previous frame': 'delay'}, inplace=True)
         df.rename(columns={'Length': 'length'}, inplace=True)
         # Replace NaN values by empty values in two columns
