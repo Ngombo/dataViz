@@ -2,7 +2,7 @@ import pandas
 import numpy
 import matplotlib.pyplot as plot
 from matplotlib.patches import Polygon
-from filtering import runfilter
+from filtering import runfilter, runfilter2
 from scipy import stats
 
 
@@ -11,29 +11,49 @@ from scipy import stats
 # Create DF sets, where to load the prepared dataFrame by the helper method
 def load(traffic, trial, protocol):
     df = pandas.DataFrame(runfilter('C:/Users/X260/Desktop/raw/' + trial + '-' + traffic + '.csv', trial, protocol))
+    return df
 
+
+def load2(traffic, trial, protocol):
+    df = pandas.DataFrame(runfilter2('C:/Users/X260/Desktop/raw/' + trial + '-' + traffic + '.csv', trial, protocol))
     return df
 
 
 # Load the datasets
-df1 = pandas.DataFrame(load('mobileidaslwm2m', '1', 'lwm2m'))
-df2 = pandas.DataFrame(load('mobileorion', '1', 'json'))
-df3 = pandas.DataFrame(load('mobileidaslwm2m', '2', 'lwm2m'))
-df4 = pandas.DataFrame(load('mobileorion', '2', 'json'))
-df5 = pandas.DataFrame(load('mobileidaslwm2m', '3', 'lwm2m'))
-df6 = pandas.DataFrame(load('mobileorion', '3', 'json'))
-df7 = pandas.DataFrame(load('mobileidaslwm2m', '4', 'lwm2m'))
-df8 = pandas.DataFrame(load('mobileorion', '4', 'json'))
-df9 = pandas.DataFrame(load('mobileidaslwm2m', '5', 'lwm2m'))
-df10 = pandas.DataFrame(load('mobileorion', '5', 'json'))
-df11 = pandas.DataFrame(load('mobileidaslwm2m', '6', 'lwm2m'))
-df12 = pandas.DataFrame(load('mobileorion', '6', 'json'))
+# df1 = pandas.DataFrame(load('mobileidaslwm2m', '1', 'lwm2m'))
+# df2 = pandas.DataFrame(load('mobileorion', '1', 'json'))
+# df3 = pandas.DataFrame(load('mobileidaslwm2m', '2', 'lwm2m'))
+# df4 = pandas.DataFrame(load('mobileorion', '2', 'json'))
+# df5 = pandas.DataFrame(load('mobileidaslwm2m', '3', 'lwm2m'))
+# df6 = pandas.DataFrame(load('mobileorion', '3', 'json'))
+df31 = pandas.DataFrame(load('boxidaslwm2morion', '3', 'lwm2m'))
+##df312 = pandas.DataFrame(load2('boxidaslwm2morion', '3', 'lwm2m'))
+#df32 = pandas.DataFrame(load2('boxidaslwm2mtrace', '3', 'lwm2m'))
+# df33 = pandas.DataFrame(load2('boxidaslwm2m', '3', 'lwm2m'))
+df34 = pandas.DataFrame(load('boxidasulorion', '3', 'json'))
+##df342 = pandas.DataFrame(load2('boxidasulorion', '3', 'json'))
+# df35 = pandas.DataFrame(load2('boxidasultrace', '3', 'json'))
+# df36 = pandas.DataFrame(load2('boxidasul', '3', 'json'))
+# df7 = pandas.DataFrame(load('mobileidaslwm2m', '4', 'lwm2m'))
+# df8 = pandas.DataFrame(load('mobileorion', '4', 'json'))
+# df9 = pandas.DataFrame(load('mobileidaslwm2m', '5', 'lwm2m'))
+# df10 = pandas.DataFrame(load('mobileorion', '5', 'json'))
+# df11 = pandas.DataFrame(load('mobileidaslwm2m', '6', 'lwm2m'))
+# df12 = pandas.DataFrame(load('mobileorion', '6', 'json'))
+df13 = pandas.DataFrame(load('boxidaslwm2morion', '6', ''))
+##df132 = pandas.DataFrame(load2('boxidaslwm2morion', '6', ''))
+df14 = pandas.DataFrame(load('boxidasulorion', '6', ''))
+##df142 = pandas.DataFrame(load2('boxidasulorion', '6', ''))
+
+deltalenghtlw = pandas.DataFrame()
+
+#print deltalenghtlw
 
 stats_df = pandas.DataFrame()
 
 
 # Main function to run the plots and tha charts
-def showresults(feature, showfliersvalue, notchvalue):
+def runboxplots(feature, showfliersvalue, notchvalue):
     # num_trials = 6
     # df = pandas.DataFrame()
     # datasets = numpy.empty(num_trials*2)  # Return a new array of given shape without initializing entries.
@@ -43,11 +63,11 @@ def showresults(feature, showfliersvalue, notchvalue):
     #     else:
     #         datasets[i-1] = df(load('mobileidaslwm2m', str(i), 'lwm2m'))
 
-    datasets = [df1[feature], df2[feature], df3[feature], df4[feature], df5[feature], df6[feature],
-                df7[feature], df8[feature], df9[feature], df10[feature], df11[feature], df12[feature]]
+    datasets = [df31[feature], df34[feature], df13[feature], df14[feature]]  # , df5[feature], df6[feature],
+    # df7[feature], df8[feature], df9[feature], df10[feature], df11[feature], df12[feature]]
 
     # Array with the number of readings counted by trial
-    sentReadings = [3210, 3236, 684, 690, 339, 341, 3221, 3319, 683, 872, 335, 368]
+    sentReadings = [25, 25, 25, 25]  # , 339, 341, 3221, 3319, 683, 872, 335, 368]
 
     # Return evenly spaced values within a given interval.
     trials = numpy.arange(1, 7)
@@ -118,7 +138,7 @@ def showresults(feature, showfliersvalue, notchvalue):
         # It is a way to have a zoom on the interquartilespace
         if showfliersvalue == 1:
             axis.plot(numpy.average(med.get_xdata()), means[i],
-                      color=box_colors[3], marker='x', markeredgewidth=2, markersize=20, markeredgecolor='k')
+                      color=box_colors[3], marker='x', markeredgewidth=2, markersize=10, markeredgecolor='k')
 
         # Stats
         sentframes = sentReadings[i]
@@ -130,7 +150,7 @@ def showresults(feature, showfliersvalue, notchvalue):
         # mode = datasets[i].mode()
         # print datasets[i].mode(self, dropna=True)
 
-        print '\nStats for df' + str(i) + ' => ' + feature
+        print '\nStats for df' + str(i + 1) + ' => ' + feature
         print 'Sent Frames: ' + str(sentframes)
         print 'Received Frames: ' + str(receivedframes)
         print 'Frame Loss: ' + str(frameloss)
@@ -193,6 +213,43 @@ def showresults(feature, showfliersvalue, notchvalue):
     figures.text(0.80, 0.1, 'json / http / tcp',
                  backgroundcolor=box_colors[1],
                  color='white', weight='roman', size='x-small')
+
+
+def runbars(feature, showfliersvalue, notchvalue):
+    datasets = [df31[feature], df34[feature], df13[feature], df14[feature]]  # , df5[feature], df6[feature],
+    # df7[feature], df8[feature], df9[feature], df10[feature], df11[feature], df12[feature]]
+
+    # Return evenly spaced values within a given interval.
+    trials = numpy.arange(1, 7)
+    # for i in range(trials*2):
+    #     datasets = numpy.empty('df'+i+'[feature]')
+
+    box_colors = ['green', 'firebrick', 'black', 'lightgrey']
+    xdata = []
+    x = numpy.arange(len(datasets))
+    for i in range(len(datasets)):
+        xdata.append(numpy.round(numpy.average(datasets[i]), 2))
+    print xdata
+
+    plot.bar(x, height=xdata, color=[box_colors[0], box_colors[1], box_colors[0], box_colors[1]])
+    plot.xticks(x, (numpy.repeat(trials, 2)))
+    plot.xticks(rotation=70)
+    plot.title('Mean ' + feature.title() + ' Distribution')
+    plot.xlabel('Trials')
+    plot.ylabel('Bytes')
+
+    plot.text(3, 30, 'lwm2m / coap / udp',
+                 backgroundcolor=box_colors[0], color='white', weight='roman',
+                 size='x-small')
+    plot.text(3, 0, 'json / http / tcp',
+                 backgroundcolor=box_colors[1],
+                 color='white', weight='roman', size='x-small')
+
+    # means0 = numpy.round(numpy.average(datasets[0]), 2)
+    # means1 = numpy.round(numpy.average(datasets[1]), 2)
+    # plot.ylabel('Bytes')
+    # axs[0].hist(means0, bins=n_bins)
+    # axs[1].hist(means1, bins=n_bins)
 
 # Store the stats a csv or further processing if needed
 # path = 'C:\Users\X260\Desktop'
