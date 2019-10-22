@@ -1,5 +1,9 @@
 import pandas
+import numpy
 import re
+
+from statistics import stats
+from variables import files_location
 
 
 # Format the values of the dataset
@@ -101,29 +105,69 @@ def runfilter(dataset, trial, protocol):
 
 
 # Eliminate the unnecessary data
-def runfilter2(dataorigin, dataend, protocol):
+def runfilter2(dataorigin, dataend, labelorigin, labelend, protocol):
     df = pandas.DataFrame()
-    if protocol == 'lwm2m':
-        dorigin = helper(dataorigin)
-        dend = helper(dataend)
-        df['delay'] = dorigin['epoch'].astype(float) - dend['epoch'].astype(float)
-        df['length'] = dorigin['length'].astype(float) - dend['length'].astype(float)
+    # if protocol == 'lw':
 
+    # #1 Insert new columns into the dataframe which values are data from origin and end
+    # df['origin'] = helper(dataorigin)['epoch']
+    # df['end'] = helper(dataend)['epoch']
+    #
+    # #2 insert new columns named 'delay' which values are the differences on epoch times
+    # df['delay'] = df['origin'] - df['end']
+
+    # 1 and 2 into one in milliseconds => nano/10^6
+    df['delay'] = (helper(dataorigin)['epoch'] - helper(dataend)['epoch'])/1000000
+
+    #Add new columns in df to enable a fusioned max columns between lenghts
+    df['length origin'] = helper2(dataorigin)['length']
+    df['length end'] = helper2(dataend)['length']
+
+    df['max length'] = df[["length origin", "length end"]].max(axis=1)
+
+    # include only the columns we want to plot
+    df = df[df.columns[df.columns.isin(['delay', 'max length'])]]
+    # frame = pandas.DataFrame()
+    # frame= frame[[dataorigin['Length'].astype(float), dataend['Length'].astype(float)]]
+    #
+    # print 'dataorigin\n', frame
+    # # compute the Bw occupancy
+    stats(df['max length'],protocol)
+    average_lengths = df['max length'].mean()
+    sum_lengths = df['max length'].sum()
+
+    print 'Delta delays between' + labelorigin + ' and ' + labelend + ' DataFrame\n', df
     return df
 
 
-# Eliminate the unnecessary data
+# Eliminate the unnecessary data and format the values
 def helper(dfin):
-    df = pandas.read_csv(dfin, usecols=['Length', 'Epoch Time'])
-    # df.rename(columns={'Time since previous frame': 'delay'}, inplace=True)
+    df = pandas.DataFrame(dfin[['Epoch Time']])
+
+    # rename columns
     df.rename(columns={'Epoch Time': 'epoch'}, inplace=True)
-    df.rename(columns={'Length': 'length'}, inplace=True)
 
     # Prevent pandas converting large numbers to exponential
-    df['epoch'] = df['epoch'].apply(lambda x: '{:.3f}'.format(x))
+    # power_scale = '9'  # nanoseconds
+    # df['epoch'] = df['epoch'].apply(lambda x: '{:.'+power_scale+'f}'.format(x))
+    df['epoch'] = df['epoch'].apply(lambda x: '{:.9f}'.format(x))
 
-    # remove the . from the values
-    df['epoch'] = df['epoch'].apply(str)
-    df['epoch'] = df['epoch'].str.replace(r'\D', '')
-    print df
+    # remove the . from the values so that we have it epoch in nanoseconds
+    df['epoch'] = df['epoch'].str.replace(r'\D', '').astype(long)
+    # convert the values into numbers for computing purposes later on
+    df['epoch'] = df['epoch'].astype(long)
+
+    #print 'helped delay  DataFrame\n', df
+    return df
+
+def helper2(dfin):
+    df = pandas.DataFrame(dfin[['Length']])
+
+    # rename columns
+    df.rename(columns={'Length': 'length'}, inplace=True)
+
+    # convert the values into numbers for computing purposes later on
+    df['length'] = df['length'].astype(long)
+
+    #print 'helped length DataFrame\n', df
     return df

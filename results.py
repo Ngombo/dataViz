@@ -4,6 +4,8 @@ import matplotlib.pyplot as plot
 from matplotlib.patches import Polygon
 from filtering import runfilter, runfilter2
 from scipy import stats
+
+from loading import run_import
 from variables import box_colors
 
 
@@ -15,11 +17,6 @@ def load(traffic, trial, protocol):
     return df
 
 
-def load2(traffic, trial, protocol):
-    df = pandas.DataFrame(runfilter2('C:/Users/X260/Desktop/raw/' + trial + '-' + traffic + '.csv', trial, protocol))
-    return df
-
-
 # Load the datasets
 # df1 = pandas.DataFrame(load('mobileidaslwm2m', '1', 'lwm2m'))
 # df2 = pandas.DataFrame(load('mobileorion', '1', 'ul'))
@@ -27,11 +24,11 @@ def load2(traffic, trial, protocol):
 # df4 = pandas.DataFrame(load('mobileorion', '2', 'ul'))
 # df5 = pandas.DataFrame(load('mobileidaslwm2m', '3', 'lwm2m'))
 # df6 = pandas.DataFrame(load('mobileorion', '3', 'ul'))
-df31 = pandas.DataFrame(load('boxidaslwm2morion', '3', 'lwm2m'))
-##df312 = pandas.DataFrame(load2('boxidaslwm2morion', '3', 'lwm2m'))
-#df32 = pandas.DataFrame(load2('boxidaslwm2mtrace', '3', 'lwm2m'))
+##df31 = pandas.DataFrame(load('boxidaslwm2morion', '3', 'lwm2m'))
+
+# df32 = pandas.DataFrame(load2('boxidaslwm2mtrace', '3', 'lwm2m'))
 # df33 = pandas.DataFrame(load2('boxidaslwm2m', '3', 'lwm2m'))
-df34 = pandas.DataFrame(load('boxidasulorion', '3', 'ul'))
+##df34 = pandas.DataFrame(load('boxidasulorion', '3', 'ul'))
 ##df342 = pandas.DataFrame(load2('boxidasulorion', '3', 'ul'))
 # df35 = pandas.DataFrame(load2('boxidasultrace', '3', 'ul'))
 # df36 = pandas.DataFrame(load2('boxidasul', '3', 'ul'))
@@ -41,14 +38,14 @@ df34 = pandas.DataFrame(load('boxidasulorion', '3', 'ul'))
 # df10 = pandas.DataFrame(load('mobileorion', '5', 'ul'))
 # df11 = pandas.DataFrame(load('mobileidaslwm2m', '6', 'lwm2m'))
 # df12 = pandas.DataFrame(load('mobileorion', '6', 'ul'))
-df13 = pandas.DataFrame(load('boxidaslwm2morion', '6', ''))
+##df13 = pandas.DataFrame(load('boxidaslwm2morion', '6', ''))
 ##df132 = pandas.DataFrame(load2('boxidaslwm2morion', '6', ''))
-df14 = pandas.DataFrame(load('boxidasulorion', '6', ''))
+##df14 = pandas.DataFrame(load('boxidasulorion', '6', ''))
 ##df142 = pandas.DataFrame(load2('boxidasulorion', '6', ''))
 
 deltalenghtlw = pandas.DataFrame()
 
-#print deltalenghtlw
+# print deltalenghtlw
 
 stats_df = pandas.DataFrame()
 
@@ -64,18 +61,19 @@ def runboxplots(feature, showfliersvalue, notchvalue):
     #     else:
     #         datasets[i-1] = df(load('mobileidaslwm2m', str(i), 'lwm2m'))
 
-    datasets = [df31[feature], df34[feature], df13[feature], df14[feature]]  # , df5[feature], df6[feature],
+    datasets = [pandas.DataFrame(), pandas.DataFrame(), pandas.DataFrame(), pandas.DataFrame()]
+
+    ### datasets = [df31[feature], df34[feature], df13[feature], df14[feature]]  # , df5[feature], df6[feature],
     # df7[feature], df8[feature], df9[feature], df10[feature], df11[feature], df12[feature]]
 
     # Array with the number of readings counted by trial
     sentReadings = [25, 25, 25, 25]  # , 339, 341, 3221, 3319, 683, 872, 335, 368]
 
     # Return evenly spaced values within a given interval.
-    trials = numpy.arange(1, 7)
+    # trials = numpy.arange(1, 11)
+    trials = 9, 10
     # for i in range(trials*2):
     #     datasets = numpy.empty('df'+i+'[feature]')
-
-
 
     # Subplots Sharing the same X Axis
     figures, axis = plot.subplots(figsize=(10, 6))
@@ -99,12 +97,9 @@ def runboxplots(feature, showfliersvalue, notchvalue):
         axis.set_title('No-Outliers ' + feature.title() + ' Distribution')
     if showfliersvalue == 1:
         axis.set_title('Full ' + feature.title() + ' Distribution')
-    axis.set_xlabel('Trials')
 
-    if feature == 'length':
-        axis.set_ylabel('Bytes')
-    if feature == 'delay':
-        axis.set_ylabel('Milliseconds')
+    axis.set_ylabel('Packet Delay (ms)')
+    axis.set_xlabel('Sample Frequency (ms)')
 
     # Now fill the boxes with desired colors
     num_boxes = len(datasets)
@@ -140,24 +135,6 @@ def runboxplots(feature, showfliersvalue, notchvalue):
         if showfliersvalue == 1:
             axis.plot(numpy.average(med.get_xdata()), means[i],
                       color=box_colors[3], marker='x', markeredgewidth=2, markersize=10, markeredgecolor='k')
-
-        # Stats
-        sentframes = sentReadings[i]
-        receivedframes = datasets[i].count()
-        frameloss = numpy.round((1 - (receivedframes / float(sentframes))) * 100, 2)
-        mean = numpy.round(means[i], 2)
-        median = numpy.round(medians[i], 2)
-        mode = stats.mode(datasets[i])
-        # mode = datasets[i].mode()
-        # print datasets[i].mode(self, dropna=True)
-
-        print '\nStats for df' + str(i + 1) + ' => ' + feature
-        print 'Sent Frames: ' + str(sentframes)
-        print 'Received Frames: ' + str(receivedframes)
-        print 'Frame Loss: ' + str(frameloss)
-        print 'mean: ' + str(mean)
-        print 'median: ' + str(median)
-        print 'mode: ' + str(mode)
 
         # Insert the results as new column to a stats data Frame
         # index = i
@@ -217,7 +194,9 @@ def runboxplots(feature, showfliersvalue, notchvalue):
 
 
 def runbars(feature, showfliersvalue, notchvalue):
-    datasets = [df31[feature], df34[feature], df13[feature], df14[feature]]  # , df5[feature], df6[feature],
+    datasets = [pandas.DataFrame(), pandas.DataFrame(), pandas.DataFrame(), pandas.DataFrame()]
+
+    ### datasets = [df31[feature], df34[feature], df13[feature], df14[feature]]  # , df5[feature], df6[feature],
     # df7[feature], df8[feature], df9[feature], df10[feature], df11[feature], df12[feature]]
 
     # Return evenly spaced values within a given interval.
@@ -238,11 +217,11 @@ def runbars(feature, showfliersvalue, notchvalue):
     plot.ylabel('Bytes')
 
     plot.text(3, 30, 'lwm2m / coap / udp',
-                 backgroundcolor=box_colors[0], color='white', weight='roman',
-                 size='x-small')
+              backgroundcolor=box_colors[0], color='white', weight='roman',
+              size='x-small')
     plot.text(3, 0, 'ul / http / tcp',
-                 backgroundcolor=box_colors[1],
-                 color='white', weight='roman', size='x-small')
+              backgroundcolor=box_colors[1],
+              color='white', weight='roman', size='x-small')
 
     # means0 = numpy.round(numpy.average(datasets[0]), 2)
     # means1 = numpy.round(numpy.average(datasets[1]), 2)
