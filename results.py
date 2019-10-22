@@ -4,6 +4,7 @@ import matplotlib.pyplot as plot
 from matplotlib.patches import Polygon
 from filtering import runfilter, runfilter2
 from scipy import stats
+from variables import box_colors
 
 
 ## adapted from https://matplotlib.org/3.1.1/gallery/statistics/boxplot_demo.html
@@ -21,25 +22,25 @@ def load2(traffic, trial, protocol):
 
 # Load the datasets
 # df1 = pandas.DataFrame(load('mobileidaslwm2m', '1', 'lwm2m'))
-# df2 = pandas.DataFrame(load('mobileorion', '1', 'json'))
+# df2 = pandas.DataFrame(load('mobileorion', '1', 'ul'))
 # df3 = pandas.DataFrame(load('mobileidaslwm2m', '2', 'lwm2m'))
-# df4 = pandas.DataFrame(load('mobileorion', '2', 'json'))
+# df4 = pandas.DataFrame(load('mobileorion', '2', 'ul'))
 # df5 = pandas.DataFrame(load('mobileidaslwm2m', '3', 'lwm2m'))
-# df6 = pandas.DataFrame(load('mobileorion', '3', 'json'))
+# df6 = pandas.DataFrame(load('mobileorion', '3', 'ul'))
 df31 = pandas.DataFrame(load('boxidaslwm2morion', '3', 'lwm2m'))
 ##df312 = pandas.DataFrame(load2('boxidaslwm2morion', '3', 'lwm2m'))
 #df32 = pandas.DataFrame(load2('boxidaslwm2mtrace', '3', 'lwm2m'))
 # df33 = pandas.DataFrame(load2('boxidaslwm2m', '3', 'lwm2m'))
-df34 = pandas.DataFrame(load('boxidasulorion', '3', 'json'))
-##df342 = pandas.DataFrame(load2('boxidasulorion', '3', 'json'))
-# df35 = pandas.DataFrame(load2('boxidasultrace', '3', 'json'))
-# df36 = pandas.DataFrame(load2('boxidasul', '3', 'json'))
+df34 = pandas.DataFrame(load('boxidasulorion', '3', 'ul'))
+##df342 = pandas.DataFrame(load2('boxidasulorion', '3', 'ul'))
+# df35 = pandas.DataFrame(load2('boxidasultrace', '3', 'ul'))
+# df36 = pandas.DataFrame(load2('boxidasul', '3', 'ul'))
 # df7 = pandas.DataFrame(load('mobileidaslwm2m', '4', 'lwm2m'))
-# df8 = pandas.DataFrame(load('mobileorion', '4', 'json'))
+# df8 = pandas.DataFrame(load('mobileorion', '4', 'ul'))
 # df9 = pandas.DataFrame(load('mobileidaslwm2m', '5', 'lwm2m'))
-# df10 = pandas.DataFrame(load('mobileorion', '5', 'json'))
+# df10 = pandas.DataFrame(load('mobileorion', '5', 'ul'))
 # df11 = pandas.DataFrame(load('mobileidaslwm2m', '6', 'lwm2m'))
-# df12 = pandas.DataFrame(load('mobileorion', '6', 'json'))
+# df12 = pandas.DataFrame(load('mobileorion', '6', 'ul'))
 df13 = pandas.DataFrame(load('boxidaslwm2morion', '6', ''))
 ##df132 = pandas.DataFrame(load2('boxidaslwm2morion', '6', ''))
 df14 = pandas.DataFrame(load('boxidasulorion', '6', ''))
@@ -59,7 +60,7 @@ def runboxplots(feature, showfliersvalue, notchvalue):
     # datasets = numpy.empty(num_trials*2)  # Return a new array of given shape without initializing entries.
     # for i in range(1, num_trials+1):
     #     if i % 2 == 0:
-    #         datasets[i-1] = df(load('mobileorion', str(i), 'json'))
+    #         datasets[i-1] = df(load('mobileorion', str(i), 'ul'))
     #     else:
     #         datasets[i-1] = df(load('mobileidaslwm2m', str(i), 'lwm2m'))
 
@@ -74,7 +75,7 @@ def runboxplots(feature, showfliersvalue, notchvalue):
     # for i in range(trials*2):
     #     datasets = numpy.empty('df'+i+'[feature]')
 
-    box_colors = ['green', 'firebrick', 'black', 'lightgrey']
+
 
     # Subplots Sharing the same X Axis
     figures, axis = plot.subplots(figsize=(10, 6))
@@ -210,7 +211,7 @@ def runboxplots(feature, showfliersvalue, notchvalue):
     figures.text(0.80, 0.13, 'lwm2m / coap / udp',
                  backgroundcolor=box_colors[0], color='white', weight='roman',
                  size='x-small')
-    figures.text(0.80, 0.1, 'json / http / tcp',
+    figures.text(0.80, 0.1, 'ul / http / tcp',
                  backgroundcolor=box_colors[1],
                  color='white', weight='roman', size='x-small')
 
@@ -223,8 +224,6 @@ def runbars(feature, showfliersvalue, notchvalue):
     trials = numpy.arange(1, 7)
     # for i in range(trials*2):
     #     datasets = numpy.empty('df'+i+'[feature]')
-
-    box_colors = ['green', 'firebrick', 'black', 'lightgrey']
     xdata = []
     x = numpy.arange(len(datasets))
     for i in range(len(datasets)):
@@ -241,7 +240,7 @@ def runbars(feature, showfliersvalue, notchvalue):
     plot.text(3, 30, 'lwm2m / coap / udp',
                  backgroundcolor=box_colors[0], color='white', weight='roman',
                  size='x-small')
-    plot.text(3, 0, 'json / http / tcp',
+    plot.text(3, 0, 'ul / http / tcp',
                  backgroundcolor=box_colors[1],
                  color='white', weight='roman', size='x-small')
 
