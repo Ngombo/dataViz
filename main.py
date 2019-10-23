@@ -6,7 +6,7 @@ from results import run_delay_boxplots, runbars
 # runboxplots('length', 0, 0)
 
 # runboxplots(outliers or not, notch or not)
-run_delay_boxplots(1, False)
+run_delay_boxplots(1, 0)
 # runboxplots('delay', 0, 0)
 
 # to keep the figures alive

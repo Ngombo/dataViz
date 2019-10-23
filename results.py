@@ -13,6 +13,9 @@ feature = 'delay'
 sep_datasets_endtoend = []
 sep_datasets_network = []
 
+sepjs_datasets_endtoend = []
+sepjs_datasets_network = []
+
 # Simultaneous trials dataset array
 sim_datasets_endtoend = []
 sim_datasets_network = []
@@ -47,18 +50,20 @@ def fill_array(method, array, feature, scope):
 
             array.append(
                 filter_network_data(origin_meas_data_lw, end_meas_data_lw,
-                                    str(x + 1) + ' : Box-idas lw traffic')[feature])
+                                    str(x + 1) + ' : ' + method + ' Box-idas lw traffic')[feature])
 
             array.append(
                 filter_network_data(origin_meas_data_ul, end_meas_data_ul,
-                                    str(x + 1) + ' : Box-idas ul traffic')[feature])
+                                    str(x + 1) + ' : ' + method + ' Box-idas ul traffic')[feature])
 
         # fill the ylabel array
         trials_numbers.append(x + 1)
 
 
 fill_array('separate', sep_datasets_endtoend, feature, 'end')
-# fill_array('separate', sep_datasets_network, feature, 'network')
+fill_array('separate', sep_datasets_network, feature, 'network')
+fill_array('separatejs', sepjs_datasets_endtoend, feature, 'end')
+fill_array('separatejs', sepjs_datasets_network, feature, 'network')
 fill_array('simultaneous', sim_datasets_endtoend, feature, 'end')
 fill_array('simultaneous', sim_datasets_network, feature, 'network')
 
@@ -70,55 +75,54 @@ fill_array('simultaneous', sim_datasets_network, feature, 'network')
 # Main function to run the plots and tha charts
 def run_delay_boxplots(showfliersvalue, draw_notches):
     # Subplots Sharing the same X Axis
-    figures, (above, below) = plot.subplots(2, sharex=True)
+    number_plots = 3
+    #figures, (above, aboventw, below, belowntw, belowjs, belowjsntw) = plot.subplots(number_plots, sharex=True)
+    figures, (above, below, belowjs) = plot.subplots(number_plots, sharex=True)
 
     # Adjust the pltos on the screen
-    # figures.subplots_adjust(left=0.075, right=0.95, top=0.9, bottom=0.25)
+    figures.subplots_adjust(left=0.085, right=0.95, top=0.95, bottom=0.1)
 
     # Legends
 
-    #figures.text(0.515, 0.6, 'Sample Frequency (ms)', ha='center', va='center', rotation='horizontal')
-
-    above.set_title('Simultaneous Readings')
-    below.set_title('Separate Readings')
+    # figures.text(0.515, 0.6, 'Sample Frequency (ms)', ha='center', va='center', rotation='horizontal')
+    size = 'large'
+    above.set_title('(a) Simultaneous Trials', size=size, ha='center')
+    #aboventw.set_title('(b) Simultaneous Network', size=size)
+    below.set_title('(b) Separate Trials', size=size)
+    #belowntw.set_title('(d) Separate Network', size=size)
+    belowjs.set_title('(c) Separate with epoch from jsLwClient', size=size)
+   # belowjsntw.set_title('(f) SeparateJSEpoch Network', size=size)
 
     figures.text(0.05, 0.5, 'Packet Delay (ms)', ha='center', va='center', rotation='vertical')
     figures.text(0.515, 0.03, 'Sample Frequency (ms)', ha='center', va='center', rotation='horizontal')
 
-    figures.text(0.90, 0.07, 'lwm2m - EndToEnd',
-                 backgroundcolor=box_colors[0], color='white', weight='roman',
+    figures.text(0.91, 0.03, 'LWM2M',
+                 backgroundcolor=box_colors[0], color='black', weight='roman',
                  size='x-small')
-    figures.text(0.90, 0.04, 'ul - EndToEnd',
+    figures.text(0.94, 0.03, 'UL',
                  backgroundcolor=box_colors[1],
-                 color='black', weight='roman', size='x-small')
-    figures.text(0.90, 0.01, 'Network',
-                 backgroundcolor=box_colors[4],
                  color='black', weight='roman', size='x-small')
 
     # Set up the boxplots
     pltbox(above, sim_datasets_endtoend, showfliersvalue, draw_notches, 'end')
     pltbox(above, sim_datasets_network, showfliersvalue, draw_notches, 'network')
+    #pltbox(aboventw, sim_datasets_network, showfliersvalue, draw_notches, 'network')
     pltbox(below, sep_datasets_endtoend, showfliersvalue, draw_notches, 'end')
-    # pltbox(below, sep_datasets_network, showfliersvalue, draw_notches, 'network')
+    pltbox(below, sep_datasets_network, showfliersvalue, draw_notches, 'network')
+    #pltbox(belowntw, sep_datasets_network, showfliersvalue, draw_notches, 'network')
+    pltbox(belowjs, sepjs_datasets_endtoend, showfliersvalue, draw_notches, 'end')
+    pltbox(belowjs, sepjs_datasets_network, showfliersvalue, draw_notches, 'network')
+   # pltbox(belowjsntw, sepjs_datasets_network, showfliersvalue, draw_notches, 'network')
 
 
 def pltbox(position, datasets, showfliersvalue, draw_notches, scope):
     boxplot = position.boxplot(datasets, notch=draw_notches, showfliers=showfliersvalue, sym='o', vert=1, whis=1.5)
 
     # Customize the characteristics of the boxplot
-    if scope == 'end':
-        plot.setp(boxplot['boxes'], color=box_colors[2])
-        plot.setp(boxplot['whiskers'], color=box_colors[2])
-        plot.setp(boxplot['medians'], color=box_colors[2])
-        plot.setp(boxplot['fliers'], color=box_colors[2], marker='.')
-
-    if scope == 'network':
-        plot.setp(boxplot['boxes'], color=box_colors[4])
-        plot.setp(boxplot['whiskers'], color=box_colors[4])
-        plot.setp(boxplot['medians'], color=box_colors[4])
-        plot.setp(boxplot['means'], color=box_colors[4])
-        plot.setp(boxplot['caps'], color=box_colors[4])
-        plot.setp(boxplot['fliers'], color=box_colors[4], marker='.')
+    plot.setp(boxplot['boxes'], color=box_colors[2])
+    plot.setp(boxplot['whiskers'], color=box_colors[2])
+    plot.setp(boxplot['medians'], color=box_colors[2])
+    plot.setp(boxplot['fliers'], color=box_colors[2], marker='.')
 
     # Add a horizontal grid to the plot, but make it very light in color
     position.yaxis.grid(True, linestyle='-', which='major', color=box_colors[3], alpha=0.5)
@@ -140,10 +144,7 @@ def pltbox(position, datasets, showfliersvalue, draw_notches, scope):
         box_coords = numpy.column_stack([boxX, boxY])
 
         # Alternate the colors
-        if scope == 'end':
-            position.add_patch(Polygon(box_coords, facecolor=box_colors[i % 2]))
-        else:
-            position.add_patch(Polygon(box_coords, facecolor=box_colors[4]))
+        position.add_patch(Polygon(box_coords, facecolor=box_colors[i % 2]))
 
         # Now draw the median lines back over what we just filled in
         med = boxplot['medians'][i]
@@ -159,9 +160,8 @@ def pltbox(position, datasets, showfliersvalue, draw_notches, scope):
 
         # Finally, overplot the sample averages, with horizontal alignment
         # in the center of each box, for the case I want to see the outliers
-        if scope == 'end':
-            position.plot(numpy.average(med.get_xdata()), means[i],
-                          color=box_colors[2], marker='x', markeredgewidth=2, markersize=5, markeredgecolor='k')
+        position.plot(numpy.average(med.get_xdata()), means[i],
+                      color=box_colors[2], marker='x', markeredgewidth=2, markersize=5, markeredgecolor='k')
 
     # Set the axes labels
     position.set_xticklabels(numpy.repeat(trials_numbers, 2), rotation=45, fontsize=8)

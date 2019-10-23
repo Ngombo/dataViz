@@ -49,12 +49,15 @@ def filter_network_data(dataorigin, dataend, label):
     # include only the columns we want to plot
     df = df[df.columns[df.columns.isin(['delay', 'max length'])]]
 
+    # Drop columns with NAN values in delay for the case the number of received packets is not the same as the sent one
+    df.dropna(subset=['delay'], inplace=True)
+
     # print 'dataorigin\n', frame
 
     # Compute Stats results
     stats(df['max length'], label)
 
-    #print 'Delta delays between for ' + label+'\n', df
+    print 'Delta delays between for ' + label + '\n', df
     return df
 
 
