@@ -2,56 +2,47 @@ import pandas
 import numpy
 import matplotlib.pyplot as plot
 from matplotlib.patches import Polygon
-from filtering import runfilter, runfilter2
+from filtering import filter_end_delays, filter_network_data
+from variables import files_location
 from scipy import stats
-
-from loading import run_import
 from variables import box_colors
 
 
 ## adapted from https://matplotlib.org/3.1.1/gallery/statistics/boxplot_demo.html
 
-# Create DF sets, where to load the prepared dataFrame by the helper method
-def load(traffic, trial, protocol):
-    df = pandas.DataFrame(runfilter('C:/Users/X260/Desktop/raw/' + trial + '-' + traffic + '.csv', trial, protocol))
+# Helper method to import csv files
+def run_import(myfile):
+    df = pandas.read_csv(files_location + myfile + '.csv')
+    # print myfile + ' DataFrame\n', df
     return df
 
 
-# Load the datasets
-# df1 = pandas.DataFrame(load('mobileidaslwm2m', '1', 'lwm2m'))
-# df2 = pandas.DataFrame(load('mobileorion', '1', 'ul'))
-# df3 = pandas.DataFrame(load('mobileidaslwm2m', '2', 'lwm2m'))
-# df4 = pandas.DataFrame(load('mobileorion', '2', 'ul'))
-# df5 = pandas.DataFrame(load('mobileidaslwm2m', '3', 'lwm2m'))
-# df6 = pandas.DataFrame(load('mobileorion', '3', 'ul'))
-##df31 = pandas.DataFrame(load('boxidaslwm2morion', '3', 'lwm2m'))
+# Import and load the datasets into dataframes
+df31 = filter_end_delays(run_import('3-boxidaslwm2morion'))
+df34 = filter_end_delays(run_import('3-boxidasulorion'))
+df13 = filter_end_delays(run_import('6-boxidaslwm2morion'))
+df14 = filter_end_delays(run_import('6-boxidasulorion'))
 
-# df32 = pandas.DataFrame(load2('boxidaslwm2mtrace', '3', 'lwm2m'))
-# df33 = pandas.DataFrame(load2('boxidaslwm2m', '3', 'lwm2m'))
-##df34 = pandas.DataFrame(load('boxidasulorion', '3', 'ul'))
-##df342 = pandas.DataFrame(load2('boxidasulorion', '3', 'ul'))
-# df35 = pandas.DataFrame(load2('boxidasultrace', '3', 'ul'))
-# df36 = pandas.DataFrame(load2('boxidasul', '3', 'ul'))
-# df7 = pandas.DataFrame(load('mobileidaslwm2m', '4', 'lwm2m'))
-# df8 = pandas.DataFrame(load('mobileorion', '4', 'ul'))
-# df9 = pandas.DataFrame(load('mobileidaslwm2m', '5', 'lwm2m'))
-# df10 = pandas.DataFrame(load('mobileorion', '5', 'ul'))
-# df11 = pandas.DataFrame(load('mobileidaslwm2m', '6', 'lwm2m'))
-# df12 = pandas.DataFrame(load('mobileorion', '6', 'ul'))
-##df13 = pandas.DataFrame(load('boxidaslwm2morion', '6', ''))
-##df132 = pandas.DataFrame(load2('boxidaslwm2morion', '6', ''))
-##df14 = pandas.DataFrame(load('boxidasulorion', '6', ''))
-##df142 = pandas.DataFrame(load2('boxidasulorion', '6', ''))
+# Import data from csv
+df3origin = run_import('3-boxidaslwm2mtrace')
+df3end = run_import('3-boxidaslwm2m')
 
-deltalenghtlw = pandas.DataFrame()
+filter_network_data(df3origin, df3end, '3-boxidaslwm2mtrace', '3-boxidaslwm2m', 'lw')
 
-# print deltalenghtlw
+colunm = 'delay'
+# Full dataset array
+datasets_delays = [df31[colunm], df34[colunm], df13[colunm], df14[colunm]]  # , df5[feature], df6[feature],
+# Simultaneous trials dataset array
+sim_datasets_delays = [df31[colunm], df34[colunm], df13[colunm], df14[colunm]]  # , df5[feature], df6[feature],
+# Separate trials dataset array
+sep_datasets_delays = [df31[colunm], df34[colunm], df13[colunm], df14[colunm]]  # , df5[feature], df6[feature],
 
-stats_df = pandas.DataFrame()
+
+# df7[feature], df8[feature], df9[feature], df10[feature], df11[feature], df12[feature]]
 
 
 # Main function to run the plots and tha charts
-def runboxplots(feature, showfliersvalue, notchvalue):
+def run_delay_boxplots(showfliersvalue, notchvalue):
     # num_trials = 6
     # df = pandas.DataFrame()
     # datasets = numpy.empty(num_trials*2)  # Return a new array of given shape without initializing entries.
@@ -60,14 +51,6 @@ def runboxplots(feature, showfliersvalue, notchvalue):
     #         datasets[i-1] = df(load('mobileorion', str(i), 'ul'))
     #     else:
     #         datasets[i-1] = df(load('mobileidaslwm2m', str(i), 'lwm2m'))
-
-    datasets = [pandas.DataFrame(), pandas.DataFrame(), pandas.DataFrame(), pandas.DataFrame()]
-
-    ### datasets = [df31[feature], df34[feature], df13[feature], df14[feature]]  # , df5[feature], df6[feature],
-    # df7[feature], df8[feature], df9[feature], df10[feature], df11[feature], df12[feature]]
-
-    # Array with the number of readings counted by trial
-    sentReadings = [25, 25, 25, 25]  # , 339, 341, 3221, 3319, 683, 872, 335, 368]
 
     # Return evenly spaced values within a given interval.
     # trials = numpy.arange(1, 11)
@@ -79,7 +62,7 @@ def runboxplots(feature, showfliersvalue, notchvalue):
     figures, axis = plot.subplots(figsize=(10, 6))
     figures.subplots_adjust(left=0.075, right=0.95, top=0.9, bottom=0.25)
 
-    boxplot = axis.boxplot(datasets, notch=notchvalue, showfliers=showfliersvalue, sym='o', vert=1, whis=1.5)
+    boxplot = axis.boxplot(datasets_delays, notch=notchvalue, showfliers=showfliersvalue, sym='o', vert=1, whis=1.5)
 
     # Customize the characteristics of the boxplot
     plot.setp(boxplot['boxes'], color=box_colors[2])
@@ -94,15 +77,15 @@ def runboxplots(feature, showfliersvalue, notchvalue):
 
     # Add a basic legend
     if showfliersvalue == 0:
-        axis.set_title('No-Outliers ' + feature.title() + ' Distribution')
+        axis.set_title('No-Outliers Delays Distribution')
     if showfliersvalue == 1:
-        axis.set_title('Full ' + feature.title() + ' Distribution')
+        axis.set_title('Full Delays Distribution')
 
     axis.set_ylabel('Packet Delay (ms)')
     axis.set_xlabel('Sample Frequency (ms)')
 
     # Now fill the boxes with desired colors
-    num_boxes = len(datasets)
+    num_boxes = len(datasets_delays)
     medians = numpy.empty(num_boxes)  # Return a new array of given shape without initializing entries.
     means = numpy.empty(num_boxes)
     for i in range(num_boxes):
@@ -127,7 +110,7 @@ def runboxplots(feature, showfliersvalue, notchvalue):
             medianY.append(med.get_ydata()[j])
             axis.plot(medianX, medianY, 'k')
         medians[i] = medianY[0]
-        means[i] = numpy.average(datasets[i])
+        means[i] = numpy.average(datasets_delays[i])
 
         # Finally, overplot the sample averages, with horizontal alignment
         # in the center of each box, for the case I want to see the outliers
@@ -194,9 +177,9 @@ def runboxplots(feature, showfliersvalue, notchvalue):
 
 
 def runbars(feature, showfliersvalue, notchvalue):
-    datasets = [pandas.DataFrame(), pandas.DataFrame(), pandas.DataFrame(), pandas.DataFrame()]
+    # datasets = [pandas.DataFrame(), pandas.DataFrame(), pandas.DataFrame(), pandas.DataFrame()]
 
-    ### datasets = [df31[feature], df34[feature], df13[feature], df14[feature]]  # , df5[feature], df6[feature],
+    datasets = [df31[feature], df34[feature], df13[feature], df14[feature]]  # , df5[feature], df6[feature],
     # df7[feature], df8[feature], df9[feature], df10[feature], df11[feature], df12[feature]]
 
     # Return evenly spaced values within a given interval.
