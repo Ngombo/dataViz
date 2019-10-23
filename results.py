@@ -3,40 +3,49 @@ import numpy
 import matplotlib.pyplot as plot
 from matplotlib.patches import Polygon
 from filtering import filter_end_delays, filter_network_data
-from variables import files_location
-from scipy import stats
+from variables import root_url, number_trials
 from variables import box_colors
 
 
-## adapted from https://matplotlib.org/3.1.1/gallery/statistics/boxplot_demo.html
+# feature to be plotted in the dataset
+feature = 'delay'
+
+# Separate trials dataset array
+sep_datasets = []
+
+# Simultaneous trials dataset array
+sim_datasets = []
+
+# Array to feed the Ylabels
+trials_numbers = []
+
 
 # Helper method to import csv files
-def run_import(myfile):
-    df = pandas.read_csv(files_location + myfile + '.csv')
+def run_import(method, trial_num, myfile):
+    df = pandas.read_csv(root_url + method + '/' + str(trial_num) + '/' + myfile + '.csv')
     # print myfile + ' DataFrame\n', df
     return df
 
+# df = pandas.DataFrame()
 
-# Import and load the datasets into dataframes
-df31 = filter_end_delays(run_import('3-boxidaslwm2morion'))
-df34 = filter_end_delays(run_import('3-boxidasulorion'))
-df13 = filter_end_delays(run_import('6-boxidaslwm2morion'))
-df14 = filter_end_delays(run_import('6-boxidasulorion'))
+def fill_array(method, array, feature):
+    for x in range(number_trials):
+        # Import and load the datasets into dataframes, and append them into the dataset array
+        array.append(filter_end_delays(run_import(method, x + 1, 'boxidaslwm2morion'))[feature])
+        array.append(filter_end_delays(run_import(method, x + 1, 'boxidasulorion'))[feature])
+
+        # fill the ylabel array
+        trials_numbers.append(x + 1)
+
+
+fill_array('separate', sep_datasets, feature)
+fill_array('simultaneous', sim_datasets, feature)
 
 # Import data from csv
-df3origin = run_import('3-boxidaslwm2mtrace')
-df3end = run_import('3-boxidaslwm2m')
+origin = run_import('simultaneous', 3, 'boxidaslwm2mtrace')
+end = run_import('simultaneous', 3, 'boxidaslwm2m')
 
-filter_network_data(df3origin, df3end, '3-boxidaslwm2mtrace', '3-boxidaslwm2m', 'lw')
-
-column = 'delay'
-# Simultaneous trials dataset array
-sim_datasets_delays = [df31[column], df34[column]]
-# Separate trials dataset array
-sep_datasets_delays = [df13[column], df14[column]]
-
-
-# df7[feature], df8[feature], df9[feature], df10[feature], df11[feature], df12[feature]]
+filter_network_data(origin, end, '3-boxidaslwm2mtrace')
 
 
 # Main function to run the plots and tha charts
@@ -62,13 +71,13 @@ def run_delay_boxplots():
                  color='black', weight='roman', size='x-small')
 
     # Set up the boxplots
-    pltbox(above, sim_datasets_delays)
-    pltbox(below, sep_datasets_delays)
+    pltbox(above, sim_datasets)
+    pltbox(below, sep_datasets)
+
 
 def pltbox(position, datasets):
     showfliersvalue = 1
     draw_notches = 0
-    trials = 10
 
     boxplot = position.boxplot(datasets, notch=draw_notches, showfliers=showfliersvalue, sym='o', vert=1, whis=1.5)
 
@@ -117,7 +126,7 @@ def pltbox(position, datasets):
                       color=box_colors[2], marker='x', markeredgewidth=2, markersize=5, markeredgecolor='k')
 
     # Set the axes labels
-    position.set_xticklabels(numpy.repeat(trials, 2), rotation=45, fontsize=8)
+    position.set_xticklabels(numpy.repeat(trials_numbers, 2), rotation=45, fontsize=8)
 
     # Due to the Y-axis scale being different across samples, it can be
     # hard to compare differences in means across the samples. Add upper
@@ -161,10 +170,10 @@ def pltbox(position, datasets):
     #
 
 
-def runbars(feature, showfliersvalue, notchvalue):
+def runbars(feature, showfliersvalue, notchvalue, datasets):
     # datasets = [pandas.DataFrame(), pandas.DataFrame(), pandas.DataFrame(), pandas.DataFrame()]
 
-    datasets = [df31[feature], df34[feature], df13[feature], df14[feature]]  # , df5[feature], df6[feature],
+    # datasets = [df31[feature], df34[feature], df13[feature], df14[feature]]  # , df5[feature], df6[feature],
     # df7[feature], df8[feature], df9[feature], df10[feature], df11[feature], df12[feature]]
 
     # Return evenly spaced values within a given interval.
@@ -196,4 +205,3 @@ def runbars(feature, showfliersvalue, notchvalue):
     # plot.ylabel('Bytes')
     # axs[0].hist(means0, bins=n_bins)
     # axs[1].hist(means1, bins=n_bins)
-

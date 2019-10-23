@@ -2,7 +2,6 @@ import pandas
 import numpy
 import re
 from statistics import stats
-from variables import files_location
 
 
 # Eliminate the unnecessary data
@@ -33,7 +32,7 @@ def filter_end_delays(df):
 
 
 # Eliminate the unnecessary data
-def filter_network_data(dataorigin, dataend, labelorigin, labelend, protocol):
+def filter_network_data(dataorigin, dataend, label):
     df = pandas.DataFrame()
     # Insert new columns named 'delay' which values are the differences on epoch times
     # in milliseconds => nano/10^6 and rounded to two decimals
@@ -53,9 +52,9 @@ def filter_network_data(dataorigin, dataend, labelorigin, labelend, protocol):
     # print 'dataorigin\n', frame
 
     # Compute Stats results
-    stats(df['max length'], protocol)
+    stats(df['max length'], label)
 
-    print 'Delta delays between' + labelorigin + ' and ' + labelend + ' DataFrame\n', df
+    #print 'Delta delays between for ' + label+'\n', df
     return df
 
 
