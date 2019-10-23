@@ -6,15 +6,16 @@ from filtering import filter_end_delays, filter_network_data
 from variables import root_url, number_trials
 from variables import box_colors
 
-
 # feature to be plotted in the dataset
 feature = 'delay'
 
 # Separate trials dataset array
-sep_datasets = []
+sep_datasets_endtoend = []
+sep_datasets_network = []
 
 # Simultaneous trials dataset array
-sim_datasets = []
+sim_datasets_endtoend = []
+sim_datasets_network = []
 
 # Array to feed the Ylabels
 trials_numbers = []
@@ -26,27 +27,36 @@ def run_import(method, trial_num, myfile):
     # print myfile + ' DataFrame\n', df
     return df
 
+
 # df = pandas.DataFrame()
 
-def fill_array(method, array, feature):
+def fill_array(method, array, feature, scope, protocol):
     for x in range(number_trials):
         # Import and load the datasets into dataframes, and append them into the dataset array
-        array.append(filter_end_delays(run_import(method, x + 1, 'boxidaslwm2morion'))[feature])
-        array.append(filter_end_delays(run_import(method, x + 1, 'boxidasulorion'))[feature])
+        ## data measured in the endpoints of the communications
+        if scope == 'end':
+            array.append(filter_end_delays(run_import(method, x + 1, 'boxidaslwm2morion'))[feature])
+            array.append(filter_end_delays(run_import(method, x + 1, 'boxidasulorion'))[feature])
+
+        ## data measured in at in and outbounds of the devices
+        if scope == 'network':
+            origin_meas_data = run_import(method, x + 1, 'boxidaslwm2mtrace')
+            end_meas_data = run_import(method, x + 1, 'boxidaslwm2m')
+            array.append(
+                filter_network_data(origin_meas_data, end_meas_data,
+                                    str(x + 1) + ' : Box-idas' + protocol + ' traffic')[feature])
 
         # fill the ylabel array
         trials_numbers.append(x + 1)
 
 
-fill_array('separate', sep_datasets, feature)
-fill_array('simultaneous', sim_datasets, feature)
+fill_array('separate', sep_datasets_endtoend, feature, 'end', '')
+##fill_array('separate', sep_datasets_network, feature, 'end', '')
+fill_array('simultaneous', sim_datasets_endtoend, feature, 'end', '')
+fill_array('simultaneous', sim_datasets_network, feature, 'network', 'lw')
 
-# Import data from csv
-origin = run_import('simultaneous', 3, 'boxidaslwm2mtrace')
-end = run_import('simultaneous', 3, 'boxidaslwm2m')
-
-filter_network_data(origin, end, '3-boxidaslwm2mtrace')
-
+print 'sim_datasets_endtoend size', len(sim_datasets_endtoend)
+print 'sep_datasets_endtoend size', len(sep_datasets_endtoend)
 
 # Main function to run the plots and tha charts
 def run_delay_boxplots():
@@ -71,8 +81,8 @@ def run_delay_boxplots():
                  color='black', weight='roman', size='x-small')
 
     # Set up the boxplots
-    pltbox(above, sim_datasets)
-    pltbox(below, sep_datasets)
+    pltbox(above, sim_datasets_endtoend)
+    pltbox(below, sep_datasets_endtoend)
 
 
 def pltbox(position, datasets):

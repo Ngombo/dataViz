@@ -17,7 +17,7 @@ def stats(df, label):
     # mode = datasets[i].mode()
     # print datasets[i].mode(self, dropna=True)
 
-    print '\nStats for ' + label
+    print '\nStats for trial number ' + label
     # print 'Sent Frames: ' + str(sentframes)
     # print 'Received Frames: ' + str(receivedframes)
     # print 'Frame Loss: ' + str(frameloss)
