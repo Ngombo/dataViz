@@ -26,7 +26,8 @@ trials_numbers = []
 
 # Helper method to import csv files
 def run_import(method, trial_num, myfile):
-    df = pandas.read_csv(root_url + method + '/' + str(trial_num) + '/' + myfile + '.csv')
+    df = pandas.read_csv(root_url + method + '/' + str(trial_num) + '/' + myfile + '.csv',
+                         dtype={"frame.time_epoch": "string"})
     # print myfile + ' DataFrame\n', df
     return df
 
@@ -34,7 +35,7 @@ def run_import(method, trial_num, myfile):
 # df = pandas.DataFrame()
 
 def fill_array(method, array, feature, scope):
-    for x in range(number_trials):
+    for x in range(0, number_trials):
         # Import and load the datasets into dataframes, and append them into the dataset array
         ## data measured in the endpoints of the communications
         if scope == 'end':
@@ -62,36 +63,35 @@ def fill_array(method, array, feature, scope):
 
 fill_array('separate', sep_datasets_endtoend, feature, 'end')
 fill_array('separate', sep_datasets_network, feature, 'network')
-fill_array('separatejs', sepjs_datasets_endtoend, feature, 'end')
-fill_array('separatejs', sepjs_datasets_network, feature, 'network')
-fill_array('simultaneous', sim_datasets_endtoend, feature, 'end')
-fill_array('simultaneous', sim_datasets_network, feature, 'network')
 
 
-# print 'sim_datasets_network size', len(sim_datasets_network)
-# print 'sep_datasets_network size', len(sep_datasets_network)
+# fill_array('separatejs', sepjs_datasets_endtoend, feature, 'end')
+# fill_array('separatejs', sepjs_datasets_network, feature, 'network')
+# fill_array('simultaneous', sim_datasets_endtoend, feature, 'end')
+# fill_array('simultaneous', sim_datasets_network, feature, 'network')
+
+
+print 'sep_datasets_endtoend size', len(sep_datasets_endtoend)
+print 'sep_datasets_network size', len(sep_datasets_network)
 
 
 # Main function to run the plots and tha charts
 def run_delay_boxplots(showfliersvalue, draw_notches):
     # Subplots Sharing the same X Axis
-    number_plots = 3
-    #figures, (above, aboventw, below, belowntw, belowjs, belowjsntw) = plot.subplots(number_plots, sharex=True)
-    figures, (above, below, belowjs) = plot.subplots(number_plots, sharex=True)
+    number_plots = 2
+    # figures, (above, aboventw, below, belowntw, belowjs, belowjsntw) = plot.subplots(number_plots, sharex=True)
+    figures, (above, below) = plot.subplots(number_plots, sharex=True)
 
-    # Adjust the pltos on the screen
+    # Adjust the plts on the screen
     figures.subplots_adjust(left=0.085, right=0.95, top=0.95, bottom=0.1)
 
     # Legends
 
     # figures.text(0.515, 0.6, 'Sample Frequency (ms)', ha='center', va='center', rotation='horizontal')
     size = 'large'
-    above.set_title('(a) Simultaneous Trials', size=size, ha='center')
-    #aboventw.set_title('(b) Simultaneous Network', size=size)
-    below.set_title('(b) Separate Trials', size=size)
-    #belowntw.set_title('(d) Separate Network', size=size)
-    belowjs.set_title('(c) Separate with epoch from jsLwClient', size=size)
-   # belowjsntw.set_title('(f) SeparateJSEpoch Network', size=size)
+    above.set_title('(a) End-to-End Traffic', size=size, ha='center')
+    below.set_title('(b) Network Traffic', size=size)
+
 
     figures.text(0.05, 0.5, 'Packet Delay (ms)', ha='center', va='center', rotation='vertical')
     figures.text(0.515, 0.03, 'Sample Frequency (ms)', ha='center', va='center', rotation='horizontal')
@@ -104,15 +104,9 @@ def run_delay_boxplots(showfliersvalue, draw_notches):
                  color='black', weight='roman', size='x-small')
 
     # Set up the boxplots
-    pltbox(above, sim_datasets_endtoend, showfliersvalue, draw_notches, 'end')
-    pltbox(above, sim_datasets_network, showfliersvalue, draw_notches, 'network')
-    #pltbox(aboventw, sim_datasets_network, showfliersvalue, draw_notches, 'network')
-    pltbox(below, sep_datasets_endtoend, showfliersvalue, draw_notches, 'end')
+    pltbox(above, sep_datasets_endtoend, showfliersvalue, draw_notches, 'end')
     pltbox(below, sep_datasets_network, showfliersvalue, draw_notches, 'network')
-    #pltbox(belowntw, sep_datasets_network, showfliersvalue, draw_notches, 'network')
-    pltbox(belowjs, sepjs_datasets_endtoend, showfliersvalue, draw_notches, 'end')
-    pltbox(belowjs, sepjs_datasets_network, showfliersvalue, draw_notches, 'network')
-   # pltbox(belowjsntw, sepjs_datasets_network, showfliersvalue, draw_notches, 'network')
+
 
 
 def pltbox(position, datasets, showfliersvalue, draw_notches, scope):

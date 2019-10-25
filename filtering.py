@@ -6,14 +6,14 @@ from statistics import stats
 
 # Eliminate the unnecessary data
 def filter_end_delays(df):
-    df.rename(columns={'String value': 'Read Epoch'}, inplace=True)
-    df.rename(columns={'Epoch Time': 'Arrive Epoch'}, inplace=True)
+    df.rename(columns={'json.value.string': 'Read Epoch'}, inplace=True)
+    df.rename(columns={'frame.time_epoch': 'Arrive Epoch'}, inplace=True)
 
     # Drop columns with NAN values in Request Method
-    df.dropna(subset=['Request Method'], inplace=True)
+    df.dropna(subset=['http.request.method'], inplace=True)
 
-    # In the column 'raw', extract single 13 digits in the strings
-    df['Read Epoch'] = df['Read Epoch'].str.extract('(\d\d\d\d\d\d\d\d\d\d\d\d\d)', expand=True)
+    # In the column 'raw', extract single 19 digits in the strings => nanoseconds epoch
+    df['Read Epoch'] = df['Read Epoch'].str.extract('(\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d)', expand=True)
     # Drop columns with NAN values in Read Epoch
     df.dropna(subset=['Read Epoch'], inplace=True)
     # Prevent pandas converting large numbers to exponential
@@ -24,7 +24,8 @@ def filter_end_delays(df):
     df['Arrive Epoch'] = df['Arrive Epoch'].str.replace(r'\D', '')
 
     # insert new column delay that is the difference between the received and sent epoch times
-    df['delay'] = df['Arrive Epoch'].astype(float) - df['Read Epoch'].astype(float)
+    precision = 1000000  # eliminate the nanosecond scale because, js do not provide epoch to this level
+    df['delay'] = df['Arrive Epoch'].astype(float) / precision - df['Read Epoch'].astype(float) / precision
 
     # include only the columns we want to plot
     df = df[df.columns[df.columns.isin(['delay'])]]
@@ -36,7 +37,7 @@ def filter_network_data(dataorigin, dataend, label):
     df = pandas.DataFrame()
     # Insert new columns named 'delay' which values are the differences on epoch times
     # in milliseconds => nano/10^6 and rounded to two decimals
-    delay_value = (helper(dataorigin)['epoch'] - helper(dataend)['epoch']) / 1000000
+    delay_value = (helper(dataend)['epoch'] - helper(dataorigin)['epoch']) / 1000000
     df['delay'] = numpy.round(delay_value, 2)
 
     # Add new columns in df to enable a fusioned max columns between lenghts
@@ -63,15 +64,15 @@ def filter_network_data(dataorigin, dataend, label):
 
 # Eliminate the unnecessary data and format the values
 def helper(dfin):
-    df = pandas.DataFrame(dfin[['Epoch Time']])
+    df = pandas.DataFrame(dfin[['frame.time_epoch']])  # , 'frame.number']])
 
     # rename columns
-    df.rename(columns={'Epoch Time': 'epoch'}, inplace=True)
+    df.rename(columns={'frame.time_epoch': 'epoch'}, inplace=True)
 
     # Prevent pandas converting large numbers to exponential
     # power_scale = '9'  # nanoseconds
     # df['epoch'] = df['epoch'].apply(lambda x: '{:.'+power_scale+'f}'.format(x))
-    df['epoch'] = df['epoch'].apply(lambda x: '{:.9f}'.format(x))
+    #df['epoch'] = df['epoch'].apply(lambda x: '{:.9f}'.format(x))
 
     # remove the . from the values so that we have it epoch in nanoseconds
     df['epoch'] = df['epoch'].str.replace(r'\D', '').astype(long)
@@ -79,15 +80,15 @@ def helper(dfin):
     # convert the values into numbers for computing purposes later on
     df['epoch'] = df['epoch'].astype(long)
 
-    # print 'helped delay  DataFrame\n', df
+    #print 'helped delay  DataFrame\n', df
     return df
 
 
 def helper2(dfin):
-    df = pandas.DataFrame(dfin[['Length']])
+    df = pandas.DataFrame(dfin[['frame.cap_len']])
 
     # rename columns
-    df.rename(columns={'Length': 'length'}, inplace=True)
+    df.rename(columns={'frame.cap_len': 'length'}, inplace=True)
 
     # convert the values into numbers for computing purposes later on
     df['length'] = df['length'].astype(long)
