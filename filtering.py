@@ -5,35 +5,64 @@ from statistics import stats
 
 
 # Eliminate the unnecessary data
-def filter_end_delays(df):
-    df.rename(columns={'json.value.string': 'Read Epoch'}, inplace=True)
-    df.rename(columns={'frame.time_epoch': 'Arrive Epoch'}, inplace=True)
+def filter_end_delays(df, stats_label, label2):
+    # df.rename(columns={'json.value.string': 'Read Epoch'}, inplace=True)
+    # df.rename(columns={'frame.time_epoch': 'Arrive Epoch'}, inplace=True)
+    df.rename(columns={'String value': 'Read Epoch'}, inplace=True)
+    df.rename(columns={'Epoch Time': 'Arrive Epoch'}, inplace=True)
+    # print 'Read Epoch' , df['Read Epoch']
+    # Drop columns with NAN values in Request Method
+    df.dropna(subset=['Request Method'], inplace=True)
+
+    # In the column 'Read Epoch', extract both the Reading number and the epoch value corresponding to it
+    # df['Read Epoch'] = df['Read Epoch'].str.extract('(\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d)', expand=True)
+    # Fist extract the x.x pattern in the string content of the cell
+    df['Read Epoch'] = df['Read Epoch'].str.findall(r"\d+\.\d+").str[0]
+    # if protocol == 'lw':
+    #     df['Read Epoch'] = df['Read Epoch'].iloc[1:]
+
+    # Extract both the Reading number
+    df['Reading number'] = df['Read Epoch'].str.split('.').str[0]
+    # Extract both the the epoch value i.e, the sensing value
+    df['Read Epoch'] = df['Read Epoch'].str.split('.').str[1]
 
     # Drop columns with NAN values in Request Method
-    df.dropna(subset=['http.request.method'], inplace=True)
+    # Due to the connect POST in the lwm2m that has no read value
+    df.dropna(subset=['Read Epoch'], inplace=True)
 
-    # In the column 'raw', extract single 19 digits in the strings => nanoseconds epoch
-    df['Read Epoch'] = df['Read Epoch'].str.extract('(\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d)', expand=True)
+    #print protocol + ' Reading number', df['Reading number']
+
+    reading_number = []
+    for x in range(0, len(df['Reading number'])):
+        reading_number.append(df['Reading number'].iloc[x])
+
+    # print 'len Reading number', len(df['Reading number'])
+    # print 'reading_number', reading_number
+
     # Drop columns with NAN values in Read Epoch
     df.dropna(subset=['Read Epoch'], inplace=True)
     # Prevent pandas converting large numbers to exponential
-    df['Arrive Epoch'] = df['Arrive Epoch'].apply(lambda x: '{:.3f}'.format(x))
+    df['Arrive Epoch'] = df['Arrive Epoch'].apply(lambda x: '{:.9f}'.format(x))
 
     # remove the . from the values
-    df['Arrive Epoch'] = df['Arrive Epoch'].apply(str)
-    df['Arrive Epoch'] = df['Arrive Epoch'].str.replace(r'\D', '')
+    df['Arrive Epoch'] = df['Arrive Epoch'].str.replace(r'\D', '').astype(long)
 
     # insert new column delay that is the difference between the received and sent epoch times
     precision = 1000000  # eliminate the nanosecond scale because, js do not provide epoch to this level
     df['delay'] = df['Arrive Epoch'].astype(float) / precision - df['Read Epoch'].astype(float) / precision
 
+    # Compute Stats results
+    stats(df['delay'], stats_label, label2)
+
+
     # include only the columns we want to plot
     df = df[df.columns[df.columns.isin(['delay'])]]
+    # print df
     return df
 
 
 # Eliminate the unnecessary data
-def filter_network_data(dataorigin, dataend, label):
+def filter_network_data(dataorigin, dataend, stats_label):
     df = pandas.DataFrame()
     # Insert new columns named 'delay' which values are the differences on epoch times
     # in milliseconds => nano/10^6 and rounded to two decimals
@@ -56,9 +85,10 @@ def filter_network_data(dataorigin, dataend, label):
     # print 'dataorigin\n', frame
 
     # Compute Stats results
-    stats(df['max length'], label)
+    stats(df['max length'], 'BW OCCUPANCY (Bytes) =>' + stats_label, 'sm')
+    stats(df['delay'], 'DELAY (ms) =>' + stats_label, '')
 
-    print 'Delta delays between for ' + label + '\n', df
+    # print 'Delta delays between for ' + label + '\n', df
     return df
 
 
@@ -72,7 +102,7 @@ def helper(dfin):
     # Prevent pandas converting large numbers to exponential
     # power_scale = '9'  # nanoseconds
     # df['epoch'] = df['epoch'].apply(lambda x: '{:.'+power_scale+'f}'.format(x))
-    #df['epoch'] = df['epoch'].apply(lambda x: '{:.9f}'.format(x))
+    # df['epoch'] = df['epoch'].apply(lambda x: '{:.9f}'.format(x))
 
     # remove the . from the values so that we have it epoch in nanoseconds
     df['epoch'] = df['epoch'].str.replace(r'\D', '').astype(long)
@@ -80,7 +110,7 @@ def helper(dfin):
     # convert the values into numbers for computing purposes later on
     df['epoch'] = df['epoch'].astype(long)
 
-    #print 'helped delay  DataFrame\n', df
+    # print 'helped delay  DataFrame\n', df
     return df
 
 

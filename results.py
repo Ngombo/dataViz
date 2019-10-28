@@ -38,9 +38,15 @@ def fill_array(method, array, feature, scope):
     for x in range(0, number_trials):
         # Import and load the datasets into dataframes, and append them into the dataset array
         ## data measured in the endpoints of the communications
+
+        stats_label = str(x + 1) + ' : ' + method + ' ' + scope
         if scope == 'end':
-            array.append(filter_end_delays(run_import(method, x + 1, 'boxidaslwm2morion'))[feature])
-            array.append(filter_end_delays(run_import(method, x + 1, 'boxidasulorion'))[feature])
+            array.append(
+                filter_end_delays(run_import(method, x + 1, 'boxidaslwm2morion'), stats_label + ' lw traffic', 'lw')[
+                    feature])
+            array.append(
+                filter_end_delays(run_import(method, x + 1, 'boxidasulorion'), stats_label + ' ul traffic', 'ul')[
+                    feature])
 
         ## data measured in at in and outbounds of the devices
         if scope == 'network':
@@ -50,12 +56,10 @@ def fill_array(method, array, feature, scope):
             end_meas_data_ul = run_import(method, x + 1, 'boxidasul')
 
             array.append(
-                filter_network_data(origin_meas_data_lw, end_meas_data_lw,
-                                    str(x + 1) + ' : ' + method + ' Box-idas lw traffic')[feature])
+                filter_network_data(origin_meas_data_lw, end_meas_data_lw, stats_label + ' lw traffic')[feature])
 
             array.append(
-                filter_network_data(origin_meas_data_ul, end_meas_data_ul,
-                                    str(x + 1) + ' : ' + method + ' Box-idas ul traffic')[feature])
+                filter_network_data(origin_meas_data_ul, end_meas_data_ul, stats_label + ' ul traffic')[feature])
 
         # fill the ylabel array
         trials_numbers.append(x + 1)
@@ -71,8 +75,10 @@ fill_array('separate', sep_datasets_network, feature, 'network')
 # fill_array('simultaneous', sim_datasets_network, feature, 'network')
 
 
-print 'sep_datasets_endtoend size', len(sep_datasets_endtoend)
-print 'sep_datasets_network size', len(sep_datasets_network)
+# print 'sep_datasets_endtoend size', len(sep_datasets_endtoend)
+# print sep_datasets_endtoend
+# print 'sep_datasets_network size', len(sep_datasets_network)
+# print sep_datasets_network
 
 
 # Main function to run the plots and tha charts
@@ -92,8 +98,7 @@ def run_delay_boxplots(showfliersvalue, draw_notches):
     above.set_title('(a) End-to-End Traffic', size=size, ha='center')
     below.set_title('(b) Network Traffic', size=size)
 
-
-    figures.text(0.05, 0.5, 'Packet Delay (ms)', ha='center', va='center', rotation='vertical')
+    figures.text(0.05, 0.53, 'Packet Delay (ms)', ha='center', va='center', rotation='vertical')
     figures.text(0.515, 0.03, 'Sample Frequency (ms)', ha='center', va='center', rotation='horizontal')
 
     figures.text(0.91, 0.03, 'LWM2M',
@@ -106,7 +111,6 @@ def run_delay_boxplots(showfliersvalue, draw_notches):
     # Set up the boxplots
     pltbox(above, sep_datasets_endtoend, showfliersvalue, draw_notches, 'end')
     pltbox(below, sep_datasets_network, showfliersvalue, draw_notches, 'network')
-
 
 
 def pltbox(position, datasets, showfliersvalue, draw_notches, scope):
