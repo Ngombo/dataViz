@@ -30,7 +30,7 @@ def filter_end_delays(df, stats_label, label2):
     # Due to the connect POST in the lwm2m that has no read value
     df.dropna(subset=['Read Epoch'], inplace=True)
 
-    #print protocol + ' Reading number', df['Reading number']
+    # print protocol + ' Reading number', df['Reading number']
 
     reading_number = []
     for x in range(0, len(df['Reading number'])):
@@ -53,7 +53,6 @@ def filter_end_delays(df, stats_label, label2):
 
     # Compute Stats results
     stats(df['delay'], stats_label, label2)
-
 
     # include only the columns we want to plot
     df = df[df.columns[df.columns.isin(['delay'])]]
@@ -85,8 +84,8 @@ def filter_network_data(dataorigin, dataend, stats_label):
     # print 'dataorigin\n', frame
 
     # Compute Stats results
-    stats(df['max length'], 'BW OCCUPANCY (Bytes) =>' + stats_label, 'sm')
-    stats(df['delay'], 'DELAY (ms) =>' + stats_label, '')
+    stats(df['max length'], stats_label + ' BW OCCUPANCY (Bytes)', 'sm')
+    stats(df['delay'], stats_label, '')
 
     # print 'Delta delays between for ' + label + '\n', df
     return df

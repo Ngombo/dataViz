@@ -24,7 +24,7 @@ def stats(df, label, label2):
     mode = numpy.round(df.mode()[0], 2)
 
 
-    print '\nStats for trial number ' + label
+    print '\nTrial # ' + label
     if label2 == 'lw' or label2 == 'ul':
         print 'Sent Frames: ' + str(sentframes)
         print 'Received Frames: ' + str(receivedframes)
