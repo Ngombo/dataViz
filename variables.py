@@ -1,9 +1,10 @@
 # Global variables
 
-number_trials = 10
-root_url = 'C:/Users/X260/Desktop/raw/'
-#box_colors = ['red', 'green', 'black', 'lightgrey', 'green']
+precision = 1000000  # of the timestamps posix epoch
+number_trials = 10  # Number of trials done
+root_url = 'C:/Users/X260/OneDrive/Documents/UC/_LCT/GeneralHands-on/LwM2M/COAPvsHTTP-ISABELA/raw/'  # Location of the files
 
+# colors array
 # https://matplotlib.org/3.1.1/tutorials/colors/colors.html
-box_colors = ['lightblue', 'lightgreen', 'black', 'lightgrey', 'green']
-box_colors2 = ['coral', 'wheat', 'black', 'lightgrey', 'green']
+box_colors = ['purple', 'yellow', 'black', 'lightgrey', 'green']
+box_colors2 = ['navy', 'chartreuse', 'black', 'lightgrey', 'green']

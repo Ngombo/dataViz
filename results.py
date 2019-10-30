@@ -10,6 +10,8 @@ from variables import box_colors, box_colors2
 datasets_sep_endtoend = []
 datasets_sep_network = []
 
+
+
 # print 'sep_datasets_endtoend size', len(sep_datasets_endtoend)
 # print sep_datasets_endtoend
 # print 'sep_datasets_network size', len(sep_datasets_network)
@@ -90,7 +92,7 @@ def run_delay_boxplots(client, feature, showfliersvalue, draw_notches):
     figures.text(0.515, 0.03, 'Sample Frequency (ms)', ha='center', va='center', rotation='horizontal')
 
     figures.text(0.91, 0.03, 'LWM2M',
-                 backgroundcolor=colors[0], color='black', weight='roman',
+                 backgroundcolor=colors[0], color='white', weight='roman',
                  size='x-small')
     figures.text(0.94, 0.03, 'UL',
                  backgroundcolor=colors[1],
@@ -194,7 +196,10 @@ def pltbox(position, datasets, showfliersvalue, draw_notches, colors):
     #
 
 
-def runbars(feature, showfliersvalue, notchvalue, datasets):
+def runbars(datasets):
+    # Adapt the color box to the client
+    colors = box_colors
+
     # datasets = [pandas.DataFrame(), pandas.DataFrame(), pandas.DataFrame(), pandas.DataFrame()]
 
     # datasets = [df31[feature], df34[feature], df13[feature], df14[feature]]  # , df5[feature], df6[feature],
@@ -213,7 +218,7 @@ def runbars(feature, showfliersvalue, notchvalue, datasets):
     plot.bar(x, height=xdata, color=[colors[0], colors[1], colors[0], colors[1]])
     plot.xticks(x, (numpy.repeat(trials, 2)))
     plot.xticks(rotation=70)
-    plot.title('Mean ' + feature.title() + ' Distribution')
+    #plot.title('Mean ' + feature.title() + ' Distribution')
     plot.xlabel('Trials')
     plot.ylabel('Bytes')
 

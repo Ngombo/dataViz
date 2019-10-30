@@ -8,11 +8,10 @@ from variables import root_url
 
 # To plot the boxplot
 feature = 'delay'  # feature to be plotted in the dataset
-outliers = 0 # plot the outliers or not
-notch = 0 # plot the notches or not
-#run_delay_boxplots('box', feature, outliers, notch)
-run_delay_boxplots('mobile', feature, outliers, notch)
-
+outliers = 0  # plot the outliers or not
+notch = 0  # plot the notches or not
+client = 'mobile'  # 'box' or 'mobile', machines that hosts that hosts the mgt protocol clients
+run_delay_boxplots(client, feature, outliers, notch)
 # runboxplots('delay', 0, 0)
 
 # to keep the figures alive
