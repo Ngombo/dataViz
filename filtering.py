@@ -15,8 +15,7 @@ def filter_end_delays(df, stats_label, label2):
     df.dropna(subset=['Request Method'], inplace=True)
 
     # In the column 'Read Epoch', extract both the Reading number and the epoch value corresponding to it
-    # df['Read Epoch'] = df['Read Epoch'].str.extract('(\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d)', expand=True)
-    # Fist extract the x.x pattern in the string content of the cell
+    # First extract the x.x pattern in the string content of the cell
     df['Read Epoch'] = df['Read Epoch'].str.findall(r"\d+\.\d+").str[0]
     # if protocol == 'lw':
     #     df['Read Epoch'] = df['Read Epoch'].iloc[1:]
@@ -48,7 +47,7 @@ def filter_end_delays(df, stats_label, label2):
     df['Arrive Epoch'] = df['Arrive Epoch'].str.replace(r'\D', '').astype(long)
 
     # insert new column delay that is the difference between the received and sent epoch times
-    precision = 1000000  # eliminate the nanosecond scale because, js do not provide epoch to this level
+    precision = 1000000  # eliminate the nanosecond scale because, all hosts rtc-OS do not provide epoch to this level
     df['delay'] = df['Arrive Epoch'].astype(float) / precision - df['Read Epoch'].astype(float) / precision
 
     # Compute Stats results

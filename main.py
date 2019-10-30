@@ -1,14 +1,20 @@
 import matplotlib.pyplot as plot
 from results import run_delay_boxplots, runbars
+from variables import root_url
 
 # showresults(feature, outliers or not, notch or not)
 ##runbars('length', 1, 0)
 # runboxplots('length', 0, 0)
 
-# runboxplots(outliers or not, notch or not)
-run_delay_boxplots(0, 0)
+# To plot the boxplot
+feature = 'delay'  # feature to be plotted in the dataset
+outliers = 0 # plot the outliers or not
+notch = 0 # plot the notches or not
+#run_delay_boxplots('box', feature, outliers, notch)
+run_delay_boxplots('mobile', feature, outliers, notch)
+
 # runboxplots('delay', 0, 0)
 
 # to keep the figures alive
 plot.show()
-# plot.savefig('delays.png', dpi=300)
+# plot.savefig(root_url+'delays.png', dpi=300)

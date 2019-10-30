@@ -4,56 +4,51 @@ import matplotlib.pyplot as plot
 from matplotlib.patches import Polygon
 from filtering import filter_end_delays, filter_network_data
 from variables import root_url, number_trials
-from variables import box_colors
+from variables import box_colors, box_colors2
 
-# feature to be plotted in the dataset
-feature = 'delay'
+# Declare dataset arrays
+datasets_sep_endtoend = []
+datasets_sep_network = []
 
-# Separate trials dataset array
-sep_datasets_endtoend = []
-sep_datasets_network = []
-
-sepjs_datasets_endtoend = []
-sepjs_datasets_network = []
-
-# Simultaneous trials dataset array
-sim_datasets_endtoend = []
-sim_datasets_network = []
+# print 'sep_datasets_endtoend size', len(sep_datasets_endtoend)
+# print sep_datasets_endtoend
+# print 'sep_datasets_network size', len(sep_datasets_network)
+# print sep_datasets_network
+# df = pandas.DataFrame()
 
 # Array to feed the Ylabels
 trials_numbers = []
 
 
 # Helper method to import csv files
-def run_import(method, trial_num, myfile):
-    df = pandas.read_csv(root_url + method + '/' + str(trial_num) + '/' + myfile + '.csv',
+def run_import(gathering, trial_num, myfile):
+    df = pandas.read_csv(root_url + gathering + '/' + str(trial_num) + '/' + myfile + '.csv',
                          dtype={"frame.time_epoch": "string"})
     # print myfile + ' DataFrame\n', df
     return df
 
 
-# df = pandas.DataFrame()
-
-def fill_array(method, array, feature, scope):
+def fill_array(gathering, array, feature, scope):
     for x in range(0, number_trials):
         # Import and load the datasets into dataframes, and append them into the dataset array
         ## data measured in the endpoints of the communications
 
-        stats_label = str(x + 1) + ' : ' + method + ' ' + scope
+        stats_label = str(x + 1) + ' : ' + gathering + ' ' + scope
         if scope == 'end':
             array.append(
-                filter_end_delays(run_import(method, x + 1, 'boxidaslwm2morion'), stats_label + ' lw traffic', 'lw')[
-                    feature])
+                filter_end_delays(run_import(gathering, x + 1, gathering.split("/")[1] + 'idaslwm2morion'),
+                                  stats_label + ' lw traffic', 'lw')[feature])
             array.append(
-                filter_end_delays(run_import(method, x + 1, 'boxidasulorion'), stats_label + ' ul traffic', 'ul')[
+                filter_end_delays(run_import(gathering, x + 1, gathering.split("/")[1] + 'idasulorion'),
+                                  stats_label + ' ul traffic', 'ul')[
                     feature])
 
         ## data measured in at in and outbounds of the devices
         if scope == 'network':
-            origin_meas_data_lw = run_import(method, x + 1, 'boxidaslwm2mtrace')
-            end_meas_data_lw = run_import(method, x + 1, 'boxidaslwm2m')
-            origin_meas_data_ul = run_import(method, x + 1, 'boxidasultrace')
-            end_meas_data_ul = run_import(method, x + 1, 'boxidasul')
+            origin_meas_data_lw = run_import(gathering, x + 1, gathering.split("/")[1] + 'idaslwm2mtrace')
+            end_meas_data_lw = run_import(gathering, x + 1, gathering.split("/")[1] + 'idaslwm2m')
+            origin_meas_data_ul = run_import(gathering, x + 1, gathering.split("/")[1] + 'idasultrace')
+            end_meas_data_ul = run_import(gathering, x + 1, gathering.split("/")[1] + 'idasul')
 
             array.append(
                 filter_network_data(origin_meas_data_lw, end_meas_data_lw, stats_label + ' lw traffic')[feature])
@@ -65,30 +60,23 @@ def fill_array(method, array, feature, scope):
         trials_numbers.append(x + 1)
 
 
-fill_array('separate', sep_datasets_endtoend, feature, 'end')
-fill_array('separate', sep_datasets_network, feature, 'network')
-
-
-# fill_array('separatejs', sepjs_datasets_endtoend, feature, 'end')
-# fill_array('separatejs', sepjs_datasets_network, feature, 'network')
-# fill_array('simultaneous', sim_datasets_endtoend, feature, 'end')
-# fill_array('simultaneous', sim_datasets_network, feature, 'network')
-
-
-# print 'sep_datasets_endtoend size', len(sep_datasets_endtoend)
-# print sep_datasets_endtoend
-# print 'sep_datasets_network size', len(sep_datasets_network)
-# print sep_datasets_network
-
-
 # Main function to run the plots and tha charts
-def run_delay_boxplots(showfliersvalue, draw_notches):
-    # Subplots Sharing the same X Axis
+def run_delay_boxplots(client, feature, showfliersvalue, draw_notches):
+    # Adapt the color box to the client
+    if client == 'box':
+        colors = box_colors
+    if client == 'mobile':
+        colors = box_colors2
+
+    # Prepare the files
+    fill_array('separate/' + client, datasets_sep_endtoend, feature, 'end')
+    fill_array('separate/' + client, datasets_sep_network, feature, 'network')
+
+    # Declare the subplots Sharing the same X Axis
     number_plots = 2
-    # figures, (above, aboventw, below, belowntw, belowjs, belowjsntw) = plot.subplots(number_plots, sharex=True)
     figures, (above, below) = plot.subplots(number_plots, sharex=True)
 
-    # Adjust the plts on the screen
+    # Adjust the plots on the screen
     figures.subplots_adjust(left=0.085, right=0.95, top=0.95, bottom=0.1)
 
     # Legends
@@ -102,28 +90,28 @@ def run_delay_boxplots(showfliersvalue, draw_notches):
     figures.text(0.515, 0.03, 'Sample Frequency (ms)', ha='center', va='center', rotation='horizontal')
 
     figures.text(0.91, 0.03, 'LWM2M',
-                 backgroundcolor=box_colors[0], color='black', weight='roman',
+                 backgroundcolor=colors[0], color='black', weight='roman',
                  size='x-small')
     figures.text(0.94, 0.03, 'UL',
-                 backgroundcolor=box_colors[1],
+                 backgroundcolor=colors[1],
                  color='black', weight='roman', size='x-small')
 
     # Set up the boxplots
-    pltbox(above, sep_datasets_endtoend, showfliersvalue, draw_notches, 'end')
-    pltbox(below, sep_datasets_network, showfliersvalue, draw_notches, 'network')
+    pltbox(above, datasets_sep_endtoend, showfliersvalue, draw_notches, colors)
+    pltbox(below, datasets_sep_network, showfliersvalue, draw_notches, colors)
 
 
-def pltbox(position, datasets, showfliersvalue, draw_notches, scope):
+def pltbox(position, datasets, showfliersvalue, draw_notches, colors):
     boxplot = position.boxplot(datasets, notch=draw_notches, showfliers=showfliersvalue, sym='o', vert=1, whis=1.5)
 
     # Customize the characteristics of the boxplot
-    plot.setp(boxplot['boxes'], color=box_colors[2])
-    plot.setp(boxplot['whiskers'], color=box_colors[2])
-    plot.setp(boxplot['medians'], color=box_colors[2])
-    plot.setp(boxplot['fliers'], color=box_colors[2], marker='.')
+    plot.setp(boxplot['boxes'], color=colors[2])
+    plot.setp(boxplot['whiskers'], color=colors[2])
+    plot.setp(boxplot['medians'], color=colors[2])
+    plot.setp(boxplot['fliers'], color=colors[2], marker='.')
 
     # Add a horizontal grid to the plot, but make it very light in color
-    position.yaxis.grid(True, linestyle='-', which='major', color=box_colors[3], alpha=0.5)
+    position.yaxis.grid(True, linestyle='-', which='major', color=colors[3], alpha=0.5)
 
     # Hide these grid behind plot objects
     position.set_axisbelow(True)
@@ -142,7 +130,7 @@ def pltbox(position, datasets, showfliersvalue, draw_notches, scope):
         box_coords = numpy.column_stack([boxX, boxY])
 
         # Alternate the colors
-        position.add_patch(Polygon(box_coords, facecolor=box_colors[i % 2]))
+        position.add_patch(Polygon(box_coords, facecolor=colors[i % 2]))
 
         # Now draw the median lines back over what we just filled in
         med = boxplot['medians'][i]
@@ -159,7 +147,7 @@ def pltbox(position, datasets, showfliersvalue, draw_notches, scope):
         # Finally, overplot the sample averages, with horizontal alignment
         # in the center of each box, for the case I want to see the outliers
         position.plot(numpy.average(med.get_xdata()), means[i],
-                      color=box_colors[2], marker='x', markeredgewidth=2, markersize=5, markeredgecolor='k')
+                      color=colors[2], marker='x', markeredgewidth=2, markersize=5, markeredgecolor='k')
 
     # Set the axes labels
     position.set_xticklabels(numpy.repeat(trials_numbers, 2), rotation=45, fontsize=8)
@@ -222,7 +210,7 @@ def runbars(feature, showfliersvalue, notchvalue, datasets):
         xdata.append(numpy.round(numpy.average(datasets[i]), 2))
     print xdata
 
-    plot.bar(x, height=xdata, color=[box_colors[0], box_colors[1], box_colors[0], box_colors[1]])
+    plot.bar(x, height=xdata, color=[colors[0], colors[1], colors[0], colors[1]])
     plot.xticks(x, (numpy.repeat(trials, 2)))
     plot.xticks(rotation=70)
     plot.title('Mean ' + feature.title() + ' Distribution')
@@ -230,10 +218,10 @@ def runbars(feature, showfliersvalue, notchvalue, datasets):
     plot.ylabel('Bytes')
 
     plot.text(3, 30, 'lwm2m / coap / udp',
-              backgroundcolor=box_colors[0], color='white', weight='roman',
+              backgroundcolor=colors[0], color='white', weight='roman',
               size='x-small')
     plot.text(3, 0, 'ul / http / tcp',
-              backgroundcolor=box_colors[1],
+              backgroundcolor=colors[1],
               color='white', weight='roman', size='x-small')
 
     # means0 = numpy.round(numpy.average(datasets[0]), 2)
