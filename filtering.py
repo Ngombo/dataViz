@@ -1,3 +1,5 @@
+import re
+
 import pandas
 import numpy
 from statistics import stats
@@ -60,40 +62,46 @@ def filter_end_delays(df, stats_label):
 # Eliminate the unnecessary data
 def filter_network_data(dataorigin, dataend, stats_label):
     df = pandas.DataFrame()
+    df1 = pandas.DataFrame()
+    df2 = pandas.DataFrame()
     # Insert new columns named 'delay' which values are the differences on epoch times
     # in milliseconds => nano/10^6 and rounded to two decimals
-    delay_value = (helper(dataend)['epoch'] - helper(dataorigin)['epoch']) / precision_delay
+    delay_value = (helper(dataend, stats_label)['epoch'] - helper(dataorigin, stats_label)['epoch']) / precision_delay
     df['delay'] = numpy.round(delay_value, 2)
-
-    # Add new columns in df to enable a fusioned max columns between lenghts
-    df['length origin'] = helper2(dataorigin)['length']
-    df['length end'] = helper2(dataend)['length']
-
+    print 'df', df
+    # Add new columns in df1 to enable a fusioned max columns between lenghts
+    df1['length origin'] = helper2(dataorigin)['length']
+    df1['length end'] = helper2(dataend)['length']
+    print 'df1', df1
     # Select the bigger number between the two values to feed the new column 'max length'
-    df['max length'] = df[["length origin", "length end"]].max(axis=1)
+    df1['max length'] = df1[["length origin", "length end"]].max(axis=1)
 
     # include only the columns we want to plot
-    df = df[df.columns[df.columns.isin(['delay', 'max length'])]]
+    #df = df[df.columns[df.columns.isin(['delay', 'max length'])]]
+    df = df[df.columns[df.columns.isin(['delay'])]]
+    df1 = df1[df1.columns[df1.columns.isin(['max length'])]]
 
-    # Drop columns with NAN values in delay for the case the number of received packets is not the same as the sent one
+    # Drop columns with NAN values for the case the number of received packets is not the same as the sent one
     df.dropna(subset=['delay'], inplace=True)
+    df1.dropna(subset=['max length'], inplace=True)
 
     # print 'dataorigin\n', frame
 
     # Compute Stats results
-    stats(df['max length'], stats_label + ' occupancy')
     stats(df['delay'], stats_label + ' delay')
+    stats(df1['max length'], stats_label + ' occupancy')
+
 
     # print 'Delta delays between for ' + label + '\n', df
     return df
 
 
 # Eliminate the unnecessary data and format the values
-def helper(dfin):
-    df = pandas.DataFrame(dfin[['frame.time_epoch']])
-    # df = pandas.DataFrame(dfin[['frame.time_epoch', 'Request Method']])
+def helper(dfin, label):
+    df = pandas.DataFrame(dfin[['frame.time_epoch', 'http.request.method']])
     # Drop columns with NAN values in Request Method i.e, non POST requests
-    # df.dropna(subset=['Request Method'], inplace=True)
+    if re.split(' ', label)[4] == 'ul':
+        df.dropna(subset=['http.request.method'], inplace=True)
 
     # rename columns
     df.rename(columns={'frame.time_epoch': 'epoch'}, inplace=True)
@@ -115,12 +123,11 @@ def helper(dfin):
 
 def helper2(dfin):
     df = pandas.DataFrame(dfin[['frame.cap_len']])
-
     # rename columns
     df.rename(columns={'frame.cap_len': 'length'}, inplace=True)
 
     # convert the values into numbers for computing purposes later on
-    df['length'] = df['length'].astype(long)/ precision_length
+    df['length'] = df['length'].astype(long) / precision_length
 
     # print 'helped length DataFrame\n', df
     return df

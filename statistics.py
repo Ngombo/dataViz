@@ -173,4 +173,12 @@ def barplot(df1, df2, client):
     plot.xlabel('Sample Frequency (s)')
     plot.ylabel('KBytes')
     plot.title('Total Bandwidth Occupancy')
+
+    # set individual bar labels above list
+    for i, v in enumerate(x1):
+        plot.text(y_pos[i] - 0.25, v + 0.01, str(numpy.round(v, 2)))
+
+
     plot.xticks(rotation=70)
+
+
