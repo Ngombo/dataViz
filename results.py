@@ -63,7 +63,7 @@ def fill_array(gathering, array, feature, scope):
 
 
 # Main function to run the plots and tha charts
-def run_delay_boxplots(client, feature, showfliersvalue, draw_notches):
+def main_run(client, feature, showfliersvalue, draw_notches):
     # Adapt the color box to the client
     if client == 'box':
         colors = box_colors
