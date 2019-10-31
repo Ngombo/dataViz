@@ -18,6 +18,8 @@ def filter_end_delays(df, stats_label):
 
     # In the column 'Read Epoch', extract both the Reading number and the epoch value corresponding to it
     # First extract the x.x pattern in the string content of the cell
+    df['Read Epoch'] = df['Read Epoch'].str.findall(r"\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d+")
+    df['Read Epoch'] = re.split(',', df['Read Epoch'])[5]
     df['Read Epoch'] = df['Read Epoch'].str.findall(r"\d+\.\d+").str[0]
 
     # Extract both the Reading number
