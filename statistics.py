@@ -15,35 +15,31 @@ dfstats_delay_end_lw = []
 dfstats_delay_end_ul = []
 dfstats_delay_net_lw = []
 dfstats_delay_net_ul = []
-columns = ['client', 'trial', 'scope', 'protocol', 'feature', 'mean', 'median', 'mode', 'total bw']
+sent_values = []
+columns = ['client', 'trial', 'scope', 'protocol', 'feature', 'arrival rate', 'mean', 'median', 'mode', 'total bw']
 
 
-def stats(df, label, label2):
+def stats(df, label):
     # Declaration of variables
     trial = re.split(' ', label)[0]
     client = re.split('/', re.split(' ', label)[2])[1]
     scope = re.split(' ', label)[3]
     protocol = re.split(' ', label)[4]
     feature = re.split(' ', label)[6]
-    total = 'n/a'
+    total_bw = 'n/a'
+    arrival_rate = 'n/a'
 
-    # sentframes = 0
-    # receivedframes = 0
-    # frameloss = 0
-    #
-    # if label2 == 'lw':
-    #     sentframes = 26
-    #     receivedframes = len(df)
-    #     frameloss = numpy.round((1 - (receivedframes / float(sentframes))) * 100, 2)
-    # if label2 == 'ul':
-    #     sentframes = 25
-    #     receivedframes = len(df)
-    #     frameloss = numpy.round((1 - (receivedframes / float(sentframes))) * 100, 2)
+    sentReadings = 25
+    receivedReadings = len(df)
+    if scope == 'end':
+        arrival_rate = numpy.round(((receivedReadings / float(sentReadings))) * 100, 2)
+        #loss = numpy.round((1 - (receivedReadings / float(sentReadings))) * 100, 2)
+
     mean = numpy.round(df.mean(), 2)
     median = numpy.round(df.median(), 2)
     mode = numpy.round(df.mode()[0], 2)
     if feature == 'occupancy':
-        total = df.sum()
+        total_bw = df.sum()
 
     # initialise data of lists
     # data = {'client': [client], 'trial': [trial], 'scope': [scope], 'protocol': [protocol], 'feature': [feature],
@@ -56,50 +52,51 @@ def stats(df, label, label2):
     #     print 'Sent Frames: ' + str(sentframes)
     #     print 'Received Frames: ' + str(receivedframes)
     #     print 'Frame Loss: ' + str(frameloss)
-    # print 'mean: ' + str(mean)
-    # print 'median: ' + str(median)
-    # print 'mode: ' + str(mode)
-    # print 'total: ' + str(total) + '\n'
-    # print dfstats_mobile_lw
-    # return dfstat
+
+    # exportcsv(dfstats_delay_end_lw, label, client, trial, scope, protocol, feature,arrival rate, mean, median, mode, total)
+    # exportcsv(dfstats_delay_end_ul,label, client, trial, scope, protocol, feature, frameloss,mean, median, mode, total)
+    # exportcsv(dfstats_delay_net_lw, label, client, trial, scope, protocol, feature, frameloss, mean, median, mode, total)
+    # exportcsv(dfstats_delay_net_ul,label,  client, trial, scope, protocol, feature, mean,frameloss, median, mode, total)
+    # exportcsv(dfstats_occup_lw, label,client, trial, scope, protocol, feature, mean,frameloss, median, mode, total)
+    # exportcsv(dfstats_occup_ul, label,client, trial, scope, protocol, feature, mean,frameloss, median, mode, total)
 
     # Delay dataframe
     if scope == 'end' and feature == 'delay' and protocol == 'lw':
-        dfstats_delay_end_lw.append([client, trial, scope, protocol, feature, mean, median, mode, total])
+        dfstats_delay_end_lw.append([client, trial, scope, protocol, feature, arrival_rate, mean, median, mode, total_bw])
         dfdelay = pandas.DataFrame(dfstats_delay_end_lw, columns=columns)
         # print dfdelay[['trial', 'scope', 'protocol', 'feature', 'mean', 'median', 'mode']]
-        # Export [['trial', 'total bw']] to .csv
-        dfdelay[['trial', 'mean', 'median', 'mode']].to_csv(
+        # Export  the following columns to .csv
+        dfdelay[['trial', 'arrival rate', 'mode']].to_csv(
             root_url + re.split(' ', label)[2] + "/" + scope + feature + "_" + protocol + ".csv",
             index=False)
     if scope == 'end' and feature == 'delay' and protocol == 'ul':
-        dfstats_delay_end_ul.append([client, trial, scope, protocol, feature, mean, median, mode, total])
+        dfstats_delay_end_ul.append([client, trial, scope, protocol, feature, arrival_rate, mean, median, mode, total_bw])
         dfdelay = pandas.DataFrame(dfstats_delay_end_ul, columns=columns)
         # print dfdelay[['trial', 'scope', 'protocol', 'feature', 'mean', 'median', 'mode']]
         # Export [['trial', 'total bw']] to .csv
-        dfdelay[['trial', 'mean', 'median', 'mode']].to_csv(
+        dfdelay[['trial', 'arrival rate', 'mode']].to_csv(
             root_url + re.split(' ', label)[2] + "/" + scope + feature + "_" + protocol + ".csv",
             index=False)
     if scope == 'network' and feature == 'delay' and protocol == 'lw':
-        dfstats_delay_net_lw.append([client, trial, scope, protocol, feature, mean, median, mode, total])
+        dfstats_delay_net_lw.append([client, trial, scope, protocol, feature, arrival_rate, mean, median, mode, total_bw])
         dfdelay = pandas.DataFrame(dfstats_delay_net_lw, columns=columns)
         # print dfdelay[['trial', 'scope', 'protocol', 'feature', 'mean', 'median', 'mode']]
         # Export [['trial', 'total bw']] to .csv
-        dfdelay[['trial', 'mean', 'median', 'mode']].to_csv(
+        dfdelay[['trial', 'mode']].to_csv(
             root_url + re.split(' ', label)[2] + "/" + scope + feature + "_" + protocol + ".csv",
             index=False)
     if scope == 'network' and feature == 'delay' and protocol == 'ul':
-        dfstats_delay_net_ul.append([client, trial, scope, protocol, feature, mean, median, mode, total])
+        dfstats_delay_net_ul.append([client, trial, scope, protocol, feature, arrival_rate, mean, median, mode, total_bw])
         dfdelay = pandas.DataFrame(dfstats_delay_net_ul, columns=columns)
         # print dfdelay[['trial', 'scope', 'protocol', 'feature', 'mean', 'median', 'mode']]
         # Export [['trial', 'total bw']] to .csv
-        dfdelay[['trial', 'mean', 'median', 'mode']].to_csv(
+        dfdelay[['trial', 'mode']].to_csv(
             root_url + re.split(' ', label)[2] + "/" + scope + feature + "_" + protocol + ".csv",
             index=False)
 
     # BW Occupancy LW dataframe
-    if scope == 'network' and feature == 'occupancy' and protocol == 'lw' and total != 'n/a':
-        dfstats_occup_lw.append([client, trial, scope, protocol, feature, mean, median, mode, total])
+    if scope == 'network' and feature == 'occupancy' and protocol == 'lw' and total_bw != 'n/a':
+        dfstats_occup_lw.append([client, trial, scope, protocol, feature, arrival_rate, mean, median, mode, total_bw])
         dflw = pandas.DataFrame(dfstats_occup_lw, columns=columns)
         # print dflw[['trial', 'total bw']]
         # Export [['trial', 'total bw']] to .csv
@@ -107,41 +104,47 @@ def stats(df, label, label2):
             root_url + re.split(' ', label)[2] + "/" + scope + feature + "_" + protocol + ".csv",
             index=False)
     # BW Occupancy UK dataframe
-    if scope == 'network' and feature == 'occupancy' and protocol == 'ul' and total != 'n/a':
-        dfstats_occup_ul.append([client, trial, scope, protocol, feature, mean, median, mode, total])
+    if scope == 'network' and feature == 'occupancy' and protocol == 'ul' and total_bw != 'n/a':
+        dfstats_occup_ul.append([client, trial, scope, protocol, feature, arrival_rate, mean, median, mode, total_bw])
         dful = pandas.DataFrame(dfstats_occup_ul, columns=columns)
         # print dful[['trial', 'total bw']]
         dful[['trial', 'total bw']].to_csv(
             root_url + re.split(' ', label)[2] + "/" + scope + feature + "_" + protocol + ".csv",
             index=False)
 
-    if scope == 'network' and feature == 'occupancy' and total != 'n/a':
-        dfstats_occupancy.append([client, trial, scope, protocol, feature, mean, median, mode, total])
+    if scope == 'network' and feature == 'occupancy' and total_bw != 'n/a':
+        dfstats_occupancy.append([client, trial, scope, protocol, feature, arrival_rate, mean, median, mode, total_bw])
         df1 = pandas.DataFrame(dfstats_occupancy, columns=columns)
-        # barplot(df1, client)
-        # print df1[['trial', 'total bw']]
+        dful = df1.loc[df1['protocol'] == 'ul', ['trial', 'protocol', 'total bw']]
+        dlw = df1.loc[df1['protocol'] == 'lw', ['trial', 'protocol', 'total bw']]
+        # print df2[['trial', 'protocol', 'total bw']]
+        #print df1
+        barplot(df1, df1, client)
 
     # return df1
 
 
-def exportcsv(df, label, mean, median, mode):
-    trial = re.split(' ', label)[0]
-    client = re.split('/', re.split(' ', label)[2])[1]
-    scope = re.split(' ', label)[3]
-    protocol = re.split(' ', label)[4]
-    feature = re.split(' ', label)[6]
-    total = 'n/a'
+def exportcsv(df, label, client, trial, scope, protocol, feature, arrival_rate, mean, median, mode, total):
+    df.append([client, trial, scope, protocol, feature, mean, median, arrival_rate, mode, total])
 
-    df.append([client, trial, scope, protocol, feature, mean, median, mode, total])
-    df1 = pandas.DataFrame(df, columns=columns)
-    # print dfdelay[['trial', 'scope', 'protocol', 'feature', 'mean', 'median', 'mode']]
-    # Export [['trial', 'total bw']] to .csv
-    df1[['trial', 'mean', 'median', 'mode']].to_csv(
-        root_url + re.split(' ', label)[2] + "/" + scope + feature + "_" + protocol + ".csv",
-        index=False)
+    if feature == 'delay':
+        df1 = pandas.DataFrame(df, columns=columns)
+        # print dfdelay[['trial', 'scope', 'protocol', 'feature', frameloss,'mean', 'median', 'mode']]
+        # Export [['trial', 'total bw']] to .csv
+        df1[['trial', 'mean', 'median', 'mode']].to_csv(
+            root_url + re.split(' ', label)[2] + "/" + scope + feature + "_" + protocol + ".csv",
+            index=False)
+
+    if feature == 'occupancy' and total != 'n/a':
+        df1 = pandas.DataFrame(df, columns=columns)
+        print df1[['trial', 'total bw']]
+        # Export [['trial', 'total bw']] to .csv
+        df1[['trial', 'total bw']].to_csv(
+            root_url + re.split(' ', label)[2] + "/" + scope + feature + "_" + protocol + ".csv",
+            index=False)
 
 
-def barplot(df, client):
+def barplot(df1, df2, client):
     # Adapt the color box to the client
     if client == 'box':
         colors = box_colors
@@ -149,12 +152,25 @@ def barplot(df, client):
         colors = box_colors2
 
     # create plot
-    objects = df['trial']
+    objects = df1['trial']
     y_pos = numpy.arange(len(objects))
-    observed_feature = df['total bw'].astype(float)
-    plot.bar(y_pos, observed_feature, align='center', alpha=0.5, color=[colors[0], colors[1]])
+
+    # observed_feature1 = df['total bw'].astype(float)
+    # extract columns value based on another column pandas dataframe
+    # df1 = df1.loc[df1['protocol'] == 'ul', ['trial', 'protocol', 'total bw']]
+    # print df1
+    # df2 = df1['total bw']
+    # print df2
+    dful = df1.loc[df1['protocol'] == 'ul', ['trial', 'protocol', 'total bw']]
+    #print dful['total bw']
+    x1 = df1['total bw'].astype(float)
+    x2 = df2['total bw'].astype(float)
+    plot.bar(y_pos, x1, align='center', alpha=0.5, color=[colors[0], colors[1]])
+    #plot.plot(y_pos, x1, "r--", label="UL")
+    #plot.plot(y_pos, x2, "b:o", label="LWM2M")
+    #plot.legend()
     plot.xticks(y_pos, objects)
-    plot.xlabel('Sample Frequency (ms)')
-    plot.ylabel('Bytes')
+    plot.xlabel('Sample Frequency (s)')
+    plot.ylabel('KBytes')
     plot.title('Total Bandwidth Occupancy')
     plot.xticks(rotation=70)

@@ -1,17 +1,17 @@
 import pandas
 import numpy
 from statistics import stats
-from variables import precision
+from variables import precision_delay, precision_length
 
 
 # Eliminate the unnecessary data
-def filter_end_delays(df, stats_label, label2):
+def filter_end_delays(df, stats_label):
     # df.rename(columns={'json.value.string': 'Read Epoch'}, inplace=True)
     # df.rename(columns={'frame.time_epoch': 'Arrive Epoch'}, inplace=True)
     df.rename(columns={'String value': 'Read Epoch'}, inplace=True)
     df.rename(columns={'Epoch Time': 'Arrive Epoch'}, inplace=True)
     # print 'Read Epoch' , df['Read Epoch']
-    # Drop columns with NAN values in Request Method
+    # Drop columns with NAN values in Request Method i.e, non POST requests
     df.dropna(subset=['Request Method'], inplace=True)
 
     # In the column 'Read Epoch', extract both the Reading number and the epoch value corresponding to it
@@ -46,10 +46,10 @@ def filter_end_delays(df, stats_label, label2):
 
     # insert new column delay that is the difference between the received and sent epoch times
     # eliminate the nanosecond scale because, all hosts rtc-OS do not provide epoch to this level
-    df['delay'] = df['Arrive Epoch'].astype(float) / precision - df['Read Epoch'].astype(float) / precision
+    df['delay'] = df['Arrive Epoch'].astype(float) / precision_delay - df['Read Epoch'].astype(float) / precision_delay
 
     # Compute Stats results
-    stats(df['delay'], stats_label + ' delay', label2)
+    stats(df['delay'], stats_label + ' delay')
 
     # include only the columns we want to plot
     df = df[df.columns[df.columns.isin(['delay'])]]
@@ -62,7 +62,7 @@ def filter_network_data(dataorigin, dataend, stats_label):
     df = pandas.DataFrame()
     # Insert new columns named 'delay' which values are the differences on epoch times
     # in milliseconds => nano/10^6 and rounded to two decimals
-    delay_value = (helper(dataend)['epoch'] - helper(dataorigin)['epoch']) / precision
+    delay_value = (helper(dataend)['epoch'] - helper(dataorigin)['epoch']) / precision_delay
     df['delay'] = numpy.round(delay_value, 2)
 
     # Add new columns in df to enable a fusioned max columns between lenghts
@@ -81,8 +81,8 @@ def filter_network_data(dataorigin, dataend, stats_label):
     # print 'dataorigin\n', frame
 
     # Compute Stats results
-    stats(df['max length'], stats_label + ' occupancy', 'sm')
-    stats(df['delay'], stats_label + ' delay', '')
+    stats(df['max length'], stats_label + ' occupancy')
+    stats(df['delay'], stats_label + ' delay')
 
     # print 'Delta delays between for ' + label + '\n', df
     return df
@@ -90,7 +90,10 @@ def filter_network_data(dataorigin, dataend, stats_label):
 
 # Eliminate the unnecessary data and format the values
 def helper(dfin):
-    df = pandas.DataFrame(dfin[['frame.time_epoch']])  # , 'frame.number']])
+    df = pandas.DataFrame(dfin[['frame.time_epoch']])
+    # df = pandas.DataFrame(dfin[['frame.time_epoch', 'Request Method']])
+    # Drop columns with NAN values in Request Method i.e, non POST requests
+    # df.dropna(subset=['Request Method'], inplace=True)
 
     # rename columns
     df.rename(columns={'frame.time_epoch': 'epoch'}, inplace=True)
@@ -117,7 +120,7 @@ def helper2(dfin):
     df.rename(columns={'frame.cap_len': 'length'}, inplace=True)
 
     # convert the values into numbers for computing purposes later on
-    df['length'] = df['length'].astype(long)
+    df['length'] = df['length'].astype(long)/ precision_length
 
     # print 'helped length DataFrame\n', df
     return df

@@ -1,6 +1,7 @@
 # Global variables
 
-precision = 1000000  # of the timestamps posix epoch
+precision_delay = 1000000  # of the timestamps posix epoch
+precision_length = 1024  # of the timestamps posix epoch
 number_trials = 10  # Number of trials done
 root_url = 'C:/Users/X260/OneDrive/Documents/UC/_LCT/GeneralHands-on/LwM2M/COAPvsHTTP-ISABELA/raw/'  # Location of the files
 

@@ -39,10 +39,10 @@ def fill_array(gathering, array, feature, scope):
         if scope == 'end':
             array.append(
                 filter_end_delays(run_import(gathering, x + 1, gathering.split("/")[1] + 'idaslwm2morion'),
-                                  stats_label + ' lw traffic', 'lw')[feature])
+                                  stats_label + ' lw traffic')[feature])
             array.append(
                 filter_end_delays(run_import(gathering, x + 1, gathering.split("/")[1] + 'idasulorion'),
-                                  stats_label + ' ul traffic', 'ul')[
+                                  stats_label + ' ul traffic')[
                     feature])
 
         ## data measured in at in and outbounds of the devices
@@ -89,7 +89,7 @@ def main_run(client, feature, showfliersvalue, draw_notches):
     below.set_title('(b) Network Traffic', size=size)
 
     figures.text(0.05, 0.53, 'Packet Delay (ms)', ha='center', va='center', rotation='vertical')
-    figures.text(0.515, 0.03, 'Sample Frequency (ms)', ha='center', va='center', rotation='horizontal')
+    figures.text(0.515, 0.03, 'Sample Frequency (s)', ha='center', va='center', rotation='horizontal')
 
     figures.text(0.91, 0.03, 'LWM2M',
                  backgroundcolor=colors[0], color='white', weight='roman',
@@ -220,7 +220,7 @@ def runbars(datasets):
     plot.xticks(rotation=70)
     #plot.title('Mean ' + feature.title() + ' Distribution')
     plot.xlabel('Trials')
-    plot.ylabel('Bytes')
+    plot.ylabel('KBytes')
 
     plot.text(3, 30, 'lwm2m / coap / udp',
               backgroundcolor=colors[0], color='white', weight='roman',
@@ -231,6 +231,6 @@ def runbars(datasets):
 
     # means0 = numpy.round(numpy.average(datasets[0]), 2)
     # means1 = numpy.round(numpy.average(datasets[1]), 2)
-    # plot.ylabel('Bytes')
+    # plot.ylabel('KBytes')
     # axs[0].hist(means0, bins=n_bins)
     # axs[1].hist(means1, bins=n_bins)
