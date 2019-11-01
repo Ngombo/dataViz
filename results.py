@@ -9,14 +9,8 @@ from variables import box_colors, box_colors2
 # Declare dataset arrays
 datasets_sep_endtoend = []
 datasets_sep_network = []
+datasets_sep_processing = []
 
-
-
-# print 'sep_datasets_endtoend size', len(sep_datasets_endtoend)
-# print sep_datasets_endtoend
-# print 'sep_datasets_network size', len(sep_datasets_network)
-# print sep_datasets_network
-# df = pandas.DataFrame()
 
 # Array to feed the Ylabels
 trials_numbers = []

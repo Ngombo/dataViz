@@ -18,8 +18,8 @@ def filter_end_delays(df, stats_label):
 
     # In the column 'Read Epoch', extract both the Reading number and the epoch value corresponding to it
     # First extract the x.x pattern in the string content of the cell
-    df['Read Epoch'] = df['Read Epoch'].str.findall(r"\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d+")
-    df['Read Epoch'] = re.split(',', df['Read Epoch'])[5]
+    ##df['Read Epoch'] = df['Read Epoch'].str.findall(r"\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d+")
+    ##df['Read Epoch'] = re.split(',', df['Read Epoch'])[5]
     df['Read Epoch'] = df['Read Epoch'].str.findall(r"\d+\.\d+").str[0]
 
     # Extract both the Reading number
@@ -63,23 +63,24 @@ def filter_end_delays(df, stats_label):
 
 # Eliminate the unnecessary data
 def filter_network_data(dataorigin, dataend, stats_label):
-    df = pandas.DataFrame()
-    df1 = pandas.DataFrame()
-    df2 = pandas.DataFrame()
+    df = pandas.DataFrame()  # for delays / network and endToend
+    df1 = pandas.DataFrame()  # for bw occupancy / network only
+
     # Insert new columns named 'delay' which values are the differences on epoch times
     # in milliseconds => nano/10^6 and rounded to two decimals
     delay_value = (helper(dataend, stats_label)['epoch'] - helper(dataorigin, stats_label)['epoch']) / precision_delay
     df['delay'] = numpy.round(delay_value, 2)
-    print 'df', df
+    # print 'df', df
+
     # Add new columns in df1 to enable a fusioned max columns between lenghts
     df1['length origin'] = helper2(dataorigin)['length']
     df1['length end'] = helper2(dataend)['length']
-    print 'df1', df1
+    # print 'df1', df1
     # Select the bigger number between the two values to feed the new column 'max length'
     df1['max length'] = df1[["length origin", "length end"]].max(axis=1)
 
-    # include only the columns we want to plot
-    #df = df[df.columns[df.columns.isin(['delay', 'max length'])]]
+    # include only the columns we want to plot for each DF
+    # df = df[df.columns[df.columns.isin(['delay', 'max length'])]]
     df = df[df.columns[df.columns.isin(['delay'])]]
     df1 = df1[df1.columns[df1.columns.isin(['max length'])]]
 
@@ -92,7 +93,6 @@ def filter_network_data(dataorigin, dataend, stats_label):
     # Compute Stats results
     stats(df['delay'], stats_label + ' delay')
     stats(df1['max length'], stats_label + ' occupancy')
-
 
     # print 'Delta delays between for ' + label + '\n', df
     return df
