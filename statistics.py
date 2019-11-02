@@ -3,6 +3,7 @@ import pandas
 import re
 import matplotlib.pyplot as plot;
 
+from main import save_images
 from variables import box_colors2, box_colors, number_trials, root_url
 
 plot.rcdefaults()
@@ -156,12 +157,7 @@ def lineplot():
     plot.plot(x, y2, "b:o", label="UL")
     plot.legend()
 
-    # Save the Images
-    # plot.savefig(C:/Users/X260/OneDrive/Documents/UC/_LCT/GeneralHands-on/LwM2M/COAPvsHTTP-ISABELA/figures/1000_readings/'+feature'.png', dpi=600, transparent=True)
-    # plot.savefig(C:/Users/X260/OneDrive/Documents/UC/_LCT/GeneralHands-on/LwM2M/COAPvsHTTP-ISABELA/figures/1000_readings/'+feature'.tiff', dpi=600)
-    # plot.savefig(C:/Users/X260/OneDrive/Documents/UC/_LCT/GeneralHands-on/LwM2M/COAPvsHTTP-ISABELA/figures/1000_readings/'+feature'.jpg', dpi=600)
-    # plot.savefig(C:/Users/X260/OneDrive/Documents/UC/_LCT/GeneralHands-on/LwM2M/COAPvsHTTP-ISABELA/figures/1000_readings/'+feature'.pdf')
-    # plot.savefig(C:/Users/X260/OneDrive/Documents/UC/_LCT/GeneralHands-on/LwM2M/COAPvsHTTP-ISABELA/figures/1000_readings/'+feature'.svg')
+    #save_images()
 
 
 def barplot(df1, df2, title, observed_values, ylabel, client):
@@ -200,12 +196,7 @@ def barplot(df1, df2, title, observed_values, ylabel, client):
 
     plot.xticks(rotation=70)
 
-    # Save the Images
-    # plot.savefig(C:/Users/X260/OneDrive/Documents/UC/_LCT/GeneralHands-on/LwM2M/COAPvsHTTP-ISABELA/figures/1000_readings/'+feature'.png', dpi=600, transparent=True)
-    # plot.savefig(C:/Users/X260/OneDrive/Documents/UC/_LCT/GeneralHands-on/LwM2M/COAPvsHTTP-ISABELA/figures/1000_readings/'+feature'.tiff', dpi=600)
-    # plot.savefig(C:/Users/X260/OneDrive/Documents/UC/_LCT/GeneralHands-on/LwM2M/COAPvsHTTP-ISABELA/figures/1000_readings/'+feature'.jpg', dpi=600)
-    # plot.savefig(C:/Users/X260/OneDrive/Documents/UC/_LCT/GeneralHands-on/LwM2M/COAPvsHTTP-ISABELA/figures/1000_readings/'+feature'.pdf')
-    # plot.savefig(C:/Users/X260/OneDrive/Documents/UC/_LCT/GeneralHands-on/LwM2M/COAPvsHTTP-ISABELA/figures/1000_readings/'+feature'.svg')
+    #save_images()
 
 def exportcsv(df, label, client, trial, scope, protocol, feature, delivery_rate, mean, median, mode, total):
     df.append([client, trial, scope, protocol, feature, mean, median, delivery_rate, mode, total])
