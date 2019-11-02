@@ -53,6 +53,7 @@ def stats(df, label):
         total_bw = df.sum()
 
     # Delay dataframe
+    # which one
     if scope == 'end' and feature == 'delay' and protocol == 'lw':
         dfstats_delay_end_lw.append(
             [client, trial, scope, protocol, feature, delivery_rate, mean, median, mode, total_bw])
