@@ -7,6 +7,35 @@ from variables import precision_delay, precision_length
 
 
 # Eliminate the unnecessary data
+def filter_process_delays(df, scope):
+    # Drop columns with NAN values in Request Method i.e, non POST requests
+    df.dropna(subset=['Request Method'], inplace=True)
+
+    if scope == 'client':
+        # # For the time being the .csv of the endToend are generated directly from .pcap
+        # # Hence, the columns have to the same names as the Ntwr .csvs
+        df.rename(columns={'String value': 'frame.time_epoch'}, inplace=True)
+        # In the column 'Read Epoch', extract both the Reading number and the epoch value corresponding to it
+        # First extract the x.x pattern in the string content of the cell
+        df['frame.time_epoch'] = df['frame.time_epoch'].str.findall(r"\d+\.\d+").str[0]
+
+        # Extract the epoch value i.e, the sensing value
+        df['frame.time_epoch'] = df['frame.time_epoch'].str.split('.').str[1]
+
+        # Drop columns with NAN values in Read Epoch
+        df.dropna(subset=['frame.time_epoch'], inplace=True)
+    if scope == 'server':
+        # # For the time being the .csv of the endToend are generated directly from .pcap
+        # # Hence, the columns have to the same names as the Ntwr .csvs
+        df.rename(columns={'Epoch Time': 'frame.time_epoch'}, inplace=True)
+
+    # # For the time being the .csv of the endToend are generated directly from .pcap
+    # # Hence, the columns have to the same names as the Ntwr .csvs
+    df.rename(columns={'Request Method': 'http.request.method'}, inplace=True)
+    df.rename(columns={'Length': 'frame.cap_len'}, inplace=True)
+    df.rename(columns={'Request Method': 'http.request.method'}, inplace=True)
+    return df
+
 def filter_end_delays(df, stats_label):
     # df.rename(columns={'json.value.string': 'Read Epoch'}, inplace=True)
     # df.rename(columns={'frame.time_epoch': 'Arrive Epoch'}, inplace=True)
@@ -43,7 +72,8 @@ def filter_end_delays(df, stats_label):
     # Drop columns with NAN values in Read Epoch
     df.dropna(subset=['Read Epoch'], inplace=True)
     # Prevent pandas converting large numbers to exponential
-    df['Arrive Epoch'] = df['Arrive Epoch'].apply(lambda x: '{:.9f}'.format(x))
+    ##df['Arrive Epoch'] = df['Arrive Epoch'].apply(lambda x: '{:.9f}'.format(x))
+
 
     # remove the . from the values
     df['Arrive Epoch'] = df['Arrive Epoch'].str.replace(r'\D', '').astype(long)
@@ -101,17 +131,14 @@ def filter_network_data(dataorigin, dataend, stats_label):
 # Eliminate the unnecessary data and format the values
 def helper(dfin, label):
     df = pandas.DataFrame(dfin[['frame.time_epoch', 'http.request.method']])
+    protocol =re.split(' ', label)[4]
+
     # Drop columns with NAN values in Request Method i.e, non POST requests
-    if re.split(' ', label)[4] == 'ul':
+    if protocol == 'ul':
         df.dropna(subset=['http.request.method'], inplace=True)
 
     # rename columns
     df.rename(columns={'frame.time_epoch': 'epoch'}, inplace=True)
-
-    # Prevent pandas converting large numbers to exponential
-    # power_scale = '9'  # nanoseconds
-    # df['epoch'] = df['epoch'].apply(lambda x: '{:.'+power_scale+'f}'.format(x))
-    # df['epoch'] = df['epoch'].apply(lambda x: '{:.9f}'.format(x))
 
     # remove the . from the values so that we have it epoch in nanoseconds
     df['epoch'] = df['epoch'].str.replace(r'\D', '').astype(long)

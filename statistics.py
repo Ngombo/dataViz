@@ -3,7 +3,7 @@ import pandas
 import re
 import matplotlib.pyplot as plot;
 
-from main import save_images
+#from main import save_images
 from variables import box_colors2, box_colors, number_trials, root_url
 
 plot.rcdefaults()
@@ -24,8 +24,10 @@ columns = ['client', 'trial', 'scope', 'protocol', 'feature', 'delivery rate', '
 
 def stats(df, label):
     # Declaration of variables
+
+    #print label
     trial = re.split(' ', label)[0]
-    client = re.split('/', re.split(' ', label)[2])[1]
+    client = re.split(' ', label)[2]
     scope = re.split(' ', label)[3]
     protocol = re.split(' ', label)[4]
     feature = re.split(' ', label)[6]
@@ -62,7 +64,7 @@ def stats(df, label):
         # Export  the following columns to .csv
         # print dfdelay
         dfdelay[['trial', 'delivery rate', 'mean', 'median', 'mode']].to_csv(
-            root_url + re.split(' ', label)[2] + "/" + scope + feature + "_" + protocol + ".csv",
+            root_url + client + "/" + scope + feature + "_" + protocol + ".csv",
             index=False)
         # print dfdelay['delivery rate']
 
@@ -74,7 +76,7 @@ def stats(df, label):
         # Export [['trial', 'total bw']] to .csv
         # print dfdelay
         dfdelay[['trial', 'delivery rate', 'mean', 'median', 'mode']].to_csv(
-            root_url + re.split(' ', label)[2] + "/" + scope + feature + "_" + protocol + ".csv",
+            root_url + client + "/" + scope + feature + "_" + protocol + ".csv",
             index=False)
 
     if scope == 'end' and feature == 'delay':
@@ -91,7 +93,7 @@ def stats(df, label):
         # print dfdelay[['trial', 'scope', 'protocol', 'feature', 'mean', 'median', 'mode']]
         # Export [['trial', 'total bw']] to .csv
         dfdelay[['trial', 'mean', 'median', 'mode']].to_csv(
-            root_url + re.split(' ', label)[2] + "/" + scope + feature + "_" + protocol + ".csv",
+            root_url + client + "/" + scope + feature + "_" + protocol + ".csv",
             index=False)
     if scope == 'network' and feature == 'delay' and protocol == 'ul':
         dfstats_delay_net_ul.append(
@@ -100,7 +102,7 @@ def stats(df, label):
         # print dfdelay[['trial', 'scope', 'protocol', 'feature', 'mean', 'median', 'mode']]
         # Export [['trial', 'total bw']] to .csv
         dfdelay[['trial', 'mean', 'median', 'mode']].to_csv(
-            root_url + re.split(' ', label)[2] + "/" + scope + feature + "_" + protocol + ".csv",
+            root_url + client + "/" + scope + feature + "_" + protocol + ".csv",
             index=False)
 
     # BW Occupancy LW dataframe
@@ -110,7 +112,7 @@ def stats(df, label):
         # print dflw[['trial', 'total bw']]
         # Export [['trial', 'total bw']] to .csv
         dflw[['trial', 'total bw']].to_csv(
-            root_url + re.split(' ', label)[2] + "/" + scope + feature + "_" + protocol + ".csv",
+            root_url + client + "/" + scope + feature + "_" + protocol + ".csv",
             index=False)
     # BW Occupancy UK dataframe
     if scope == 'network' and feature == 'occupancy' and protocol == 'ul' and total_bw != 'n/a':
@@ -118,7 +120,7 @@ def stats(df, label):
         dful = pandas.DataFrame(dfstats_occup_ul, columns=columns)
         # print dful[['trial', 'total bw']]
         dful[['trial', 'total bw']].to_csv(
-            root_url + re.split(' ', label)[2] + "/" + scope + feature + "_" + protocol + ".csv",
+            root_url + client + "/" + scope + feature + "_" + protocol + ".csv",
             index=False)
 
     if scope == 'network' and feature == 'occupancy' and total_bw != 'n/a':
