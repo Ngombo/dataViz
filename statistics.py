@@ -130,7 +130,7 @@ def stats(df, label):
         dlw = df1.loc[df1['protocol'] == 'lw', ['trial', 'protocol', 'total bw']]
         # print df2[['trial', 'protocol', 'total bw']]
         # print df1
-        #barplot(df1, df1, 'Total Bandwidth Occupancy','total bw', 'KBytes',  client)
+        #barplot(df1, df1, 'Total Bandwidth Occupancy - On Wire','total bw', 'KBytes',  client)
 
     # return df1
 
