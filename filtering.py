@@ -22,12 +22,18 @@ def filter_process_delays(df, scope):
         # Extract the epoch value i.e, the sensing value
         df['frame.time_epoch'] = df['frame.time_epoch'].str.split('.').str[1]
 
+        # Format the number to adjust to df3 and df4
+        # Insert a "." after the first 10 numeric characters from the left
+        df['frame.time_epoch'] = df['frame.time_epoch'].str.replace(r'^((?:\D*\d){10})(?=.+)', r'\1.')
+
         # Drop columns with NAN values in Read Epoch
         df.dropna(subset=['frame.time_epoch'], inplace=True)
     if scope == 'server':
         # # For the time being the .csv of the endToend are generated directly from .pcap
         # # Hence, the columns have to the same names as the Ntwr .csvs
         df.rename(columns={'Epoch Time': 'frame.time_epoch'}, inplace=True)
+
+
 
     # # For the time being the .csv of the endToend are generated directly from .pcap
     # # Hence, the columns have to the same names as the Ntwr .csvs
@@ -100,7 +106,8 @@ def filter_network_data(dataorigin, dataend, stats_label):
     # in milliseconds => nano/10^6 and rounded to two decimals
     delay_value = (helper(dataend, stats_label)['epoch'] - helper(dataorigin, stats_label)['epoch']) / precision_delay
     df['delay'] = numpy.round(delay_value, 2)
-    # print 'df', df
+    #print 'Delay Network  ' + stats_label, df[['delay']]
+   # print 'Delay Network  ' + stats_label, df
 
     # Add new columns in df1 to enable a fusioned max columns between lenghts
     df1['length origin'] = helper2(dataorigin)['length']
@@ -145,8 +152,9 @@ def helper(dfin, label):
 
     # convert the values into numbers for computing purposes later on
     df['epoch'] = df['epoch'].astype(long)
-
-    # print 'helped delay  DataFrame\n', df
+    #
+    # if protocol == 'lw':
+    #     print 'Timestamp Network  ' + label, df[['delay']]
     return df
 
 

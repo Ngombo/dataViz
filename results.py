@@ -35,83 +35,90 @@ def fill_array(client, array, feature, scope):
         stats_label = str(x + 1) + ' : ' + client + ' ' + scope
         if scope == 'end':
             array.append(
-                filter_end_delays(run_import(client, x + 1, client + 'idaslwm2morion'),
+                #filter_end_delays(run_import(client, x + 1, client + 'idaslwm2morion'),
+                filter_end_delays(run_import(client, x + 1, 'idaslw_orion'),
                                   stats_label + ' lw traffic')[feature])
             array.append(
-                filter_end_delays(run_import(client, x + 1, client + 'idasulorion'),
+                #filter_end_delays(run_import(client, x + 1, client + 'idasulorion'),
+                filter_end_delays(run_import(client, x + 1, 'idasul_orion'),
                                   stats_label + ' ul traffic')[
                     feature])
 
         ## data measured in at in and outbounds of the devices
         if scope == 'network':
-            origin_meas_data_lw = run_import(client, x + 1, client + 'idaslwm2mtrace')
-            end_meas_data_lw = run_import(client, x + 1, client + 'idaslwm2m')
-            origin_meas_data_ul = run_import(client, x + 1, client + 'idasultrace')
-            end_meas_data_ul = run_import(client, x + 1, client + 'idasul')
+            # origin_meas_data_lw = run_import(client, x + 1, client + 'idaslwm2mtrace')
+            # end_meas_data_lw = run_import(client, x + 1, client + 'idaslwm2m')
+            # origin_meas_data_ul = run_import(client, x + 1, client + 'idasultrace')
+            # end_meas_data_ul = run_import(client, x + 1, client + 'idasul')
+            origin_netw_lw = run_import(client, x + 1, 'lw_outbound')
+            end_netw_lw = run_import(client, x + 1, 'lw_inbound')
+            origin_netw_ul = run_import(client, x + 1, 'ul_outbound')
+            end_netw_ul = run_import(client, x + 1, 'ul_inbound')
 
             array.append(
-                filter_network_data(origin_meas_data_lw, end_meas_data_lw, stats_label + ' lw traffic')[feature])
+                filter_network_data(origin_netw_lw, end_netw_lw, stats_label + ' lw traffic')[feature])
 
             array.append(
-                filter_network_data(origin_meas_data_ul, end_meas_data_ul, stats_label + ' ul traffic')[feature])
+                filter_network_data(origin_netw_ul, end_netw_ul, stats_label + ' ul traffic')[feature])
 
         # fill the ylabel array
         trials_numbers.append(x + 1)
 
 
 def fill_array2(client, array, feature, scope):
-    for x in range(0, number_trials):
+    for x in range(number_trials):
         stats_label = str(x + 1) + ' : ' + client + ' ' + scope
 
         # Import and load the datasets into dataframes
-        ##df1 = run_import(client, x + 1, client + 'idaslwm2morion')[
-           ## ['String value', 'Epoch Time', 'Length', 'Request Method']]
-        df2 = run_import(client, x + 1, client + 'idasulorion')[
+        df1 = run_import(client, x + 1, 'idaslw_orion')[
+            ['String value', 'Epoch Time', 'Length', 'Request Method']]
+        df2 = run_import(client, x + 1, 'idasul_orion')[
             ['String value', 'Epoch Time', 'Length', 'Request Method']]
 
+        # Make sure we pick the right values for the computation purpose
+        df1 = filter_process_delays(df1, scope)
+        df2 = filter_process_delays(df2, scope)
+        #print 'df1 ' + scope+' '+str( x + 1), df1[['frame.time_epoch']]
         if scope == 'client':
-            # Make sure we pick the right values for the computation purpose
-            ##df1 = filter_process_delays(df1, scope)
-            df2 = filter_process_delays(df2, scope)
-
             # Import and load the datasets into dataframes
-           ## df3 = run_import(client, x + 1, client + 'idaslwm2mtrace')
-            df4 = run_import(client, x + 1, client + 'idasultrace')
+            df3 = run_import(client, x + 1, 'lw_outbound')
+            df4 = run_import(client, x + 1, 'ul_outbound')
+
+           # print 'df3 '+scope +' '+str( x + 1), df3[['frame.time_epoch']]
             #print '\ndf1 \n'+stats_label, df1
             # print '\ndf2', df2
             #print '\ndf3 \n'+stats_label, df3
            # print '\nstats_label', df4
 
             # Compute the delta values between the Sent and received timestamps for each Reading
-           ## client_delay_lw = filter_network_data(df1, df3, stats_label + ' lw traffic')[feature]
-            client_delay_ul = filter_network_data(df2, df4, stats_label + ' ul traffic')[feature]
+            ##client_delay_lw = filter_network_data(df1, df3, stats_label + ' lw traffic')[feature]
+            ##client_delay_ul = filter_network_data(df2, df4, stats_label + ' ul traffic')[feature]
 
             # Append them into the same dataset array to be plotted later on
             ##array.append(client_delay_lw)
-            array.append(client_delay_ul)
-            array.append(client_delay_ul)
+            ##array.append(client_delay_ul)
+            ##array.append(client_delay_ul)
 
         if scope == 'server':
-            ##df1 = filter_process_delays(df1, scope)
-            df2 = filter_process_delays(df2, scope)
 
-            ##df5 = run_import(client, x + 1, client + 'idaslwm2m')
-            df6 = run_import(client, x + 1, client + 'idasul')
+            df3 = run_import(client, x + 1, 'lw_inbound')
+            df4 = run_import(client, x + 1, 'ul_inbound')
 
-            ##server_delay_lw = filter_network_data(df5, df1, stats_label + ' lw traffic')[feature]
-            server_delay_ul = filter_network_data(df6, df2, stats_label + ' ul traffic')[feature]
+           # print 'df3 '+scope+' '+str( x + 1), df3[['frame.time_epoch']]
+            ##server_delay_lw = filter_network_data(df1, df3, stats_label + ' lw traffic')[feature]
+            ##server_delay_ul = filter_network_data(df2, df4, stats_label + ' ul traffic')[feature]
 
-            ##array.append(server_delay_lw)
-            array.append(server_delay_ul)
-            array.append(server_delay_ul)
+           ## array.append(server_delay_lw)
+           ## array.append(server_delay_ul)
+            ##array.append(server_delay_ul)
 
 
 # Main function to run the plots and tha charts
 def main_run(client, feature, showfliersvalue, draw_notches):
     # Adapt the color box to the client
-    if client == 'box':
+    if client == 'statio':
         colors = box_colors
-    if client == 'mobile':
+    if client == 'mob':
         colors = box_colors2
 
     # Prepare the files
@@ -121,8 +128,8 @@ def main_run(client, feature, showfliersvalue, draw_notches):
     fill_array2(client, datasets_sep_serverprocessing, feature, 'server')
 
     # Declare the subplots Sharing the same X Axis
-    number_plots = 4
-    figures, (a, b, c, d) = plot.subplots(number_plots, sharex=True)
+    number_plots = 2
+    figures, (b, d) = plot.subplots(number_plots, sharex=True)
 
     # Adjust the plots on the screen
     figures.subplots_adjust(left=0.085, right=0.95, top=0.95, bottom=0.1)
@@ -132,9 +139,9 @@ def main_run(client, feature, showfliersvalue, draw_notches):
     # figures.text(0.515, 0.6, 'Sample Frequency (ms)', ha='center', va='center', rotation='horizontal')
     size = 'large'
 
-    a.set_title('(a) Client Host', size=size, ha='center')
+   # a.set_title('(a) Client Host', size=size, ha='center')
     b.set_title('(b) Network', size=size)
-    c.set_title('(c) Server Host', size=size)
+    #c.set_title('(c) Server Host', size=size)
     d.set_title('(d) End-to-End', size=size, ha='center')
 
     figures.text(0.05, 0.53, 'Packet Delay (ms)', ha='center', va='center', rotation='vertical')
@@ -148,9 +155,9 @@ def main_run(client, feature, showfliersvalue, draw_notches):
                  color='black', weight='roman', size='x-small')
 
     # Set up the boxplots
-    pltbox(a, datasets_sep_clientprocessing, showfliersvalue, draw_notches, colors)
+    #pltbox(a, datasets_sep_clientprocessing, showfliersvalue, draw_notches, colors)
     pltbox(b, datasets_sep_network, showfliersvalue, draw_notches, colors)
-    pltbox(c, datasets_sep_serverprocessing, showfliersvalue, draw_notches, colors)
+    #pltbox(c, datasets_sep_serverprocessing, showfliersvalue, draw_notches, colors)
     pltbox(d, datasets_sep_endtoend, showfliersvalue, draw_notches, colors)
 
 

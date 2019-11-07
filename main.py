@@ -5,9 +5,10 @@ from results import main_run
 
 
 feature = 'delay'  # feature to be plotted in the dataset
-outliers = 0  # plot the outliers or not
+outliers = 1  # plot the outliers or not
 notch = 0  # plot the notches or not
-client = 'mobile'  # 'box' or 'mobile', machines that hosts that hosts the mgt protocol clients
+#client = 'mobile'  # 'box' or 'mobile', machines that hosts that hosts the mgt protocol clients
+client = 'statio'  # 'statio' or 'mob', machines that hosts that hosts the mgt protocol clients
 
 # To compute everything
 main_run(client, feature, outliers, notch)
