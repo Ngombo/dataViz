@@ -141,8 +141,8 @@ def helper(dfin, label):
     protocol =re.split(' ', label)[4]
 
     # Drop columns with NAN values in Request Method i.e, non POST requests
-    if protocol == 'ul':
-        df.dropna(subset=['http.request.method'], inplace=True)
+    # if protocol == 'ul':
+    #     df.dropna(subset=['http.request.method'], inplace=True)
 
     # rename columns
     df.rename(columns={'frame.time_epoch': 'epoch'}, inplace=True)
