@@ -140,11 +140,11 @@ def main_run(client, feature, showfliersvalue, draw_notches):
     size = 'large'
 
    # a.set_title('(a) Client Host', size=size, ha='center')
-    b.set_title('(b) Network', size=size)
+    b.set_title('(b) On-Wire Network Frames', size=size)
     #c.set_title('(c) Server Host', size=size)
-    d.set_title('(d) End-to-End', size=size, ha='center')
+    d.set_title('(d) End-to-End Sensor Readings', size=size, ha='center')
 
-    figures.text(0.05, 0.53, 'Packet Delay (ms)', ha='center', va='center', rotation='vertical')
+    figures.text(0.05, 0.53, 'Delay (ms)', ha='center', va='center', rotation='vertical')
     figures.text(0.515, 0.03, 'Sample Frequency (s)', ha='center', va='center', rotation='horizontal')
 
     figures.text(0.91, 0.03, 'LWM2M',
