@@ -7,40 +7,40 @@ from variables import precision_delay, precision_length
 
 
 # Eliminate the unnecessary data
-def filter_process_delays(df, scope):
-    # Drop columns with NAN values in Request Method i.e, non POST requests
-    df.dropna(subset=['Request Method'], inplace=True)
-
-    if scope == 'client':
-        # # For the time being the .csv of the endToend are generated directly from .pcap
-        # # Hence, the columns have to the same names as the Ntwr .csvs
-        df.rename(columns={'String value': 'frame.time_epoch'}, inplace=True)
-        # In the column 'Read Epoch', extract both the Reading number and the epoch value corresponding to it
-        # First extract the x.x pattern in the string content of the cell
-        df['frame.time_epoch'] = df['frame.time_epoch'].str.findall(r"\d+\.\d+").str[0]
-
-        # Extract the epoch value i.e, the sensing value
-        df['frame.time_epoch'] = df['frame.time_epoch'].str.split('.').str[1]
-
-        # Format the number to adjust to df3 and df4
-        # Insert a "." after the first 10 numeric characters from the left
-        df['frame.time_epoch'] = df['frame.time_epoch'].str.replace(r'^((?:\D*\d){10})(?=.+)', r'\1.')
-
-        # Drop columns with NAN values in Read Epoch
-        df.dropna(subset=['frame.time_epoch'], inplace=True)
-    if scope == 'server':
-        # # For the time being the .csv of the endToend are generated directly from .pcap
-        # # Hence, the columns have to the same names as the Ntwr .csvs
-        df.rename(columns={'Epoch Time': 'frame.time_epoch'}, inplace=True)
-
-
-
-    # # For the time being the .csv of the endToend are generated directly from .pcap
-    # # Hence, the columns have to the same names as the Ntwr .csvs
-    df.rename(columns={'Request Method': 'http.request.method'}, inplace=True)
-    df.rename(columns={'Length': 'frame.cap_len'}, inplace=True)
-    df.rename(columns={'Request Method': 'http.request.method'}, inplace=True)
-    return df
+# def filter_process_delays(df, scope):
+#     # Drop columns with NAN values in Request Method i.e, non POST requests
+#     df.dropna(subset=['Request Method'], inplace=True)
+#
+#     if scope == 'client':
+#         # # For the time being the .csv of the endToend are generated directly from .pcap
+#         # # Hence, the columns have to the same names as the Ntwr .csvs
+#         df.rename(columns={'String value': 'frame.time_epoch'}, inplace=True)
+#         # In the column 'Read Epoch', extract both the Reading number and the epoch value corresponding to it
+#         # First extract the x.x pattern in the string content of the cell
+#         df['frame.time_epoch'] = df['frame.time_epoch'].str.findall(r"\d+\.\d+").str[0]
+#
+#         # Extract the epoch value i.e, the sensing value
+#         df['frame.time_epoch'] = df['frame.time_epoch'].str.split('.').str[1]
+#
+#         # Format the number to adjust to df3 and df4
+#         # Insert a "." after the first 10 numeric characters from the left
+#         df['frame.time_epoch'] = df['frame.time_epoch'].str.replace(r'^((?:\D*\d){10})(?=.+)', r'\1.')
+#
+#         # Drop columns with NAN values in Read Epoch
+#         df.dropna(subset=['frame.time_epoch'], inplace=True)
+#     if scope == 'server':
+#         # # For the time being the .csv of the endToend are generated directly from .pcap
+#         # # Hence, the columns have to the same names as the Ntwr .csvs
+#         df.rename(columns={'Epoch Time': 'frame.time_epoch'}, inplace=True)
+#
+#
+#
+#     # # For the time being the .csv of the endToend are generated directly from .pcap
+#     # # Hence, the columns have to the same names as the Ntwr .csvs
+#     df.rename(columns={'Request Method': 'http.request.method'}, inplace=True)
+#     df.rename(columns={'Length': 'frame.cap_len'}, inplace=True)
+#     df.rename(columns={'Request Method': 'http.request.method'}, inplace=True)
+#     return df
 
 def filter_end_delays(df, stats_label):
     # df.rename(columns={'json.value.string': 'Read Epoch'}, inplace=True)

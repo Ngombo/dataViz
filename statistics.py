@@ -146,17 +146,17 @@ def stats(df, label):
     # exportcsv(dfstats_occup_ul, label,client, trial, scope, protocol, feature, mean,frameloss, median, mode, total)
 
 
-def lineplot():
-    df = pandas.read_csv(root_url + 'mob/enddelay_lw.csv')
-    df1 = pandas.read_csv(root_url + 'mob/enddelay_ul.csv')
-    x = df1['trial']
-    y1 = df['packet Loss Ratio']
-    y2 = df1['packet Loss Ratio']
-    plot.plot(x, y1, "r--", label="LWM2M")
-    plot.plot(x, y2, "b:o", label="UL")
-    plot.legend()
-
-    #save_images()
+# def lineplot():
+#     df = pandas.read_csv(root_url + 'mob/enddelay_lw.csv')
+#     df1 = pandas.read_csv(root_url + 'mob/enddelay_ul.csv')
+#     x = df1['trial']
+#     y1 = df['packet Loss Ratio']
+#     y2 = df1['packet Loss Ratio']
+#     plot.plot(x, y1, "r--", label="LWM2M/CoAP/UDP")
+#     plot.plot(x, y2, "b:o", label="UL/HTTP/TCP")
+#     plot.legend()
+#
+#     #save_images()
 
 
 def barplot(df1, df2, title, observed_values, ylabel, client):
