@@ -19,7 +19,7 @@ dfstats_delay_end_ul = []
 dfstats_delay_net_lw = []
 dfstats_delay_net_ul = []
 sent_values = []
-columns = ['client', 'trial', 'scope', 'protocol', 'feature', 'packet Loss Ratio', 'mean', 'median', 'mode', 'total bw']
+columns = ['client', 'trial', 'scope', 'protocol', 'feature', 'packet loss rate', 'mean', 'median', 'mode', 'total bw']
 
 
 def stats(df, label):
@@ -32,7 +32,7 @@ def stats(df, label):
     protocol = re.split(' ', label)[4]
     feature = re.split(' ', label)[6]
     total_bw = 'n/a'
-    loss_ratio = 'n/a'
+    loss_rate = 'n/a'
 
     receivedReadings = len(df)
 
@@ -41,7 +41,7 @@ def stats(df, label):
         # if (numpy.round((receivedReadings / float(sentReadings)) * 100, 2)) > 100:
         #     delivery_rate = 100 # To be stabilized in the proper version of the data collection
         # else:
-        loss_ratio = numpy.round((1-(receivedReadings / float(sentReadings))) * 100, 2)
+        loss_rate = numpy.round((1-(receivedReadings / float(sentReadings))) * 100, 2)
         # loss = numpy.round((1 - (receivedReadings / float(sentReadings))) * 100, 2)
 
     mean = numpy.round(df.mean(), 2)
@@ -54,37 +54,37 @@ def stats(df, label):
     # which one
     if scope == 'end' and feature == 'delay' and protocol == 'lw':
         dfstats_delay_end_lw.append(
-            [client, trial, scope, protocol, feature, loss_ratio, mean, median, mode, total_bw])
+            [client, trial, scope, protocol, feature, loss_rate, mean, median, mode, total_bw])
         dfdelay = pandas.DataFrame(dfstats_delay_end_lw, columns=columns)
         # print dfdelay[['trial', 'scope', 'protocol', 'feature', 'mean', 'median', 'mode']]
         # Export  the following columns to .csv
         # print dfdelay
-        dfdelay[['trial', 'packet Loss Ratio', 'mean', 'median', 'mode']].to_csv(
+        dfdelay[['trial', 'packet loss rate', 'mean', 'median', 'mode']].to_csv(
             root_url + client + "/" + scope + feature + "_" + protocol + ".csv",
             index=False)
-        # print dfdelay['packet Loss Ratio']
+        # print dfdelay['packet loss rate']
 
     if scope == 'end' and feature == 'delay' and protocol == 'ul':
         dfstats_delay_end_ul.append(
-            [client, trial, scope, protocol, feature, loss_ratio, mean, median, mode, total_bw])
+            [client, trial, scope, protocol, feature, loss_rate, mean, median, mode, total_bw])
         dfdelay = pandas.DataFrame(dfstats_delay_end_ul, columns=columns)
         # print dfdelay[['trial', 'scope', 'protocol', 'feature', 'mean', 'median', 'mode']]
         # Export [['trial', 'total bw']] to .csv
         # print dfdelay
-        dfdelay[['trial', 'packet Loss Ratio', 'mean', 'median', 'mode']].to_csv(
+        dfdelay[['trial', 'packet loss rate', 'mean', 'median', 'mode']].to_csv(
             root_url + client + "/" + scope + feature + "_" + protocol + ".csv",
             index=False)
 
     if scope == 'end' and feature == 'delay':
         dfstats_loss.append(
-            [client, trial, scope, protocol, feature, loss_ratio, mean, median, mode, total_bw])
+            [client, trial, scope, protocol, feature, loss_rate, mean, median, mode, total_bw])
         dfdelay = pandas.DataFrame(dfstats_loss, columns=columns)
-        barplot(dfdelay, dfdelay, 'Loss Ratio' , 'packet Loss Ratio', "%", client)
-       # barplot(dfdelay, dfdelay, 'Most Frequent Values of Delays', 'mode', "ms", client)
+        #barplot(dfdelay, dfdelay, 'loss rate' , 'packet loss rate', "%", client)
+        barplot(dfdelay, dfdelay, 'Most Frequent Values of Delays', 'mode', "ms", client)
 
     if scope == 'network' and feature == 'delay' and protocol == 'lw':
         dfstats_delay_net_lw.append(
-            [client, trial, scope, protocol, feature, loss_ratio, mean, median, mode, total_bw])
+            [client, trial, scope, protocol, feature, loss_rate, mean, median, mode, total_bw])
         dfdelay = pandas.DataFrame(dfstats_delay_net_lw, columns=columns)
         # print dfdelay[['trial', 'scope', 'protocol', 'feature', 'mean', 'median', 'mode']]
         # Export [['trial', 'total bw']] to .csv
@@ -93,7 +93,7 @@ def stats(df, label):
             index=False)
     if scope == 'network' and feature == 'delay' and protocol == 'ul':
         dfstats_delay_net_ul.append(
-            [client, trial, scope, protocol, feature, loss_ratio, mean, median, mode, total_bw])
+            [client, trial, scope, protocol, feature, loss_rate, mean, median, mode, total_bw])
         dfdelay = pandas.DataFrame(dfstats_delay_net_ul, columns=columns)
         # print dfdelay[['trial', 'scope', 'protocol', 'feature', 'mean', 'median', 'mode']]
         # Export [['trial', 'total bw']] to .csv
@@ -103,7 +103,7 @@ def stats(df, label):
 
     # BW Occupancy LW dataframe
     if scope == 'network' and feature == 'occupancy' and protocol == 'lw' and total_bw != 'n/a':
-        dfstats_occup_lw.append([client, trial, scope, protocol, feature, loss_ratio, mean, median, mode, total_bw])
+        dfstats_occup_lw.append([client, trial, scope, protocol, feature, loss_rate, mean, median, mode, total_bw])
         dflw = pandas.DataFrame(dfstats_occup_lw, columns=columns)
         # print dflw[['trial', 'total bw']]
         # Export [['trial', 'total bw']] to .csv
@@ -112,7 +112,7 @@ def stats(df, label):
             index=False)
     # BW Occupancy UK dataframe
     if scope == 'network' and feature == 'occupancy' and protocol == 'ul' and total_bw != 'n/a':
-        dfstats_occup_ul.append([client, trial, scope, protocol, feature, loss_ratio, mean, median, mode, total_bw])
+        dfstats_occup_ul.append([client, trial, scope, protocol, feature, loss_rate, mean, median, mode, total_bw])
         dful = pandas.DataFrame(dfstats_occup_ul, columns=columns)
         # print dful[['trial', 'total bw']]
         dful[['trial', 'total bw']].to_csv(
@@ -120,13 +120,13 @@ def stats(df, label):
             index=False)
 
     if scope == 'network' and feature == 'occupancy' and total_bw != 'n/a':
-        dfstats_occupancy.append([client, trial, scope, protocol, feature, loss_ratio, mean, median, mode, total_bw])
+        dfstats_occupancy.append([client, trial, scope, protocol, feature, loss_rate, mean, median, mode, total_bw])
         df1 = pandas.DataFrame(dfstats_occupancy, columns=columns)
         dful = df1.loc[df1['protocol'] == 'ul', ['trial', 'protocol', 'total bw']]
         dlw = df1.loc[df1['protocol'] == 'lw', ['trial', 'protocol', 'total bw']]
         # print df2[['trial', 'protocol', 'total bw']]
         # print df1
-        #barplot(df1, df1, 'Total Bandwidth Occupancy - On Wire','total bw', 'KBytes',  client)
+        #barplot(df1, df1, 'Total Bandwidth On-Wire','total bw', 'KBytes',  client)
 
     # return df1
 
@@ -138,7 +138,7 @@ def stats(df, label):
     #     print 'Received Frames: ' + str(receivedframes)
     #     print 'Frame Loss: ' + str(frameloss)
 
-    # exportcsv(dfstats_delay_end_lw, label, client, trial, scope, protocol, feature,packet Loss Ratio, mean, median, mode, total)
+    # exportcsv(dfstats_delay_end_lw, label, client, trial, scope, protocol, feature,packet loss rate, mean, median, mode, total)
     # exportcsv(dfstats_delay_end_ul,label, client, trial, scope, protocol, feature, frameloss,mean, median, mode, total)
     # exportcsv(dfstats_delay_net_lw, label, client, trial, scope, protocol, feature, frameloss, mean, median, mode, total)
     # exportcsv(dfstats_delay_net_ul,label,  client, trial, scope, protocol, feature, mean,frameloss, median, mode, total)
@@ -150,8 +150,8 @@ def stats(df, label):
 #     df = pandas.read_csv(root_url + 'mob/enddelay_lw.csv')
 #     df1 = pandas.read_csv(root_url + 'mob/enddelay_ul.csv')
 #     x = df1['trial']
-#     y1 = df['packet Loss Ratio']
-#     y2 = df1['packet Loss Ratio']
+#     y1 = df['packet loss rate']
+#     y2 = df1['packet loss rate']
 #     plot.plot(x, y1, "r--", label="LWM2M/CoAP/UDP")
 #     plot.plot(x, y2, "b:o", label="UL/HTTP/TCP")
 #     plot.legend()

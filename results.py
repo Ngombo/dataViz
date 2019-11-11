@@ -147,12 +147,13 @@ def main_run(client, feature, showfliersvalue, draw_notches):
     figures.text(0.05, 0.53, 'Delay (ms)', ha='center', va='center', rotation='vertical')
     figures.text(0.515, 0.03, 'Sample Frequency (s)', ha='center', va='center', rotation='horizontal')
 
-    figures.text(0.91, 0.04, 'LWM2M/CoAP/UDP',
-                 backgroundcolor=colors[0], color='white', weight='roman',
-                 size='x-small')
-    figures.text(0.94, 0.01, 'UL/HTTP/TCP',
+    figures.text(0.8, 0.53, 'UL/HTTP/TCP',
                  backgroundcolor=colors[1],
                  color='black', weight='roman', size='x-small')
+    figures.text(0.8, 0.50, 'LWM2M/CoAP/UDP',
+                 backgroundcolor=colors[0], color='white', weight='roman',
+                 size='x-small')
+
 
     # Set up the boxplots
     #pltbox(a, datasets_sep_clientprocessing, showfliersvalue, draw_notches, colors)

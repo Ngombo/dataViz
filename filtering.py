@@ -3,8 +3,7 @@ import re
 import pandas
 import numpy
 from statistics import stats
-from variables import precision_delay, precision_length
-
+from variables import precision_delay, precision_length, root_url
 
 # Eliminate the unnecessary data
 # def filter_process_delays(df, scope):
@@ -41,8 +40,16 @@ from variables import precision_delay, precision_length
 #     df.rename(columns={'Length': 'frame.cap_len'}, inplace=True)
 #     df.rename(columns={'Request Method': 'http.request.method'}, inplace=True)
 #     return df
+# Declare dataset arrays
+lw_downtime_array = []
+
 
 def filter_end_delays(df, stats_label):
+    # To fill the lw_downtime_array only for LW
+    protocol = re.split(' ', stats_label)[4]
+    client = re.split(' ', stats_label)[2]
+    trial = re.split(' ', stats_label)[0]
+
     # df.rename(columns={'json.value.string': 'Read Epoch'}, inplace=True)
     # df.rename(columns={'frame.time_epoch': 'Arrive Epoch'}, inplace=True)
     df.rename(columns={'String value': 'Read Epoch'}, inplace=True)
@@ -68,18 +75,36 @@ def filter_end_delays(df, stats_label):
 
     # print protocol + ' Reading number', df['Reading number']
 
-    reading_number = []
-    for x in range(0, len(df['Reading number'])):
-        reading_number.append(df['Reading number'].iloc[x])
+    # reading_number = []
+    # for x in range(0, len(df['Reading number'])):
+    #     reading_number.append(df['Reading number'].iloc[x])
 
     # print 'len Reading number', len(df['Reading number'])
     # print 'reading_number', reading_number
 
-    # Drop columns with NAN values in Read Epoch
-    df.dropna(subset=['Read Epoch'], inplace=True)
+    # # Drop columns with NAN values in Read Epoch
+    # df.dropna(subset=['Read Epoch'], inplace=True)
     # Prevent pandas converting large numbers to exponential
     ##df['Arrive Epoch'] = df['Arrive Epoch'].apply(lambda x: '{:.9f}'.format(x))
 
+    # Create a data frame with all the timestamps for lw trials
+    if protocol == 'lw':
+        # print 'Read Epoch'+stats_label, df['Read Epoch'].astype(float)
+        # lw_downtime_array.append( [df['Read Epoch'].astype(float)])
+        # print 'Read Epoch ' + trial + '\n', df['Read Epoch']
+
+        df1 = df['Read Epoch'].str[:10].astype(
+            long)   # Nano to seconds, as the sample frequency is in seconds
+        df1.rename(columns={'Read Epoch': ''}, inplace=True)
+
+        lw_downtime_array.append(df1)
+
+        # print 'lw_downtime_array', lw_downtime_array
+        dfdowntime = pandas.DataFrame(lw_downtime_array).transpose()
+
+        # Export to CSV
+        dfdowntime.to_csv(root_url + client + "/" + client + "_downtime.csv", index=False)
+        # print 'lw_downtime_array\n', dfdowntime
 
     # remove the . from the values
     df['Arrive Epoch'] = df['Arrive Epoch'].str.replace(r'\D', '').astype(long)
@@ -93,7 +118,6 @@ def filter_end_delays(df, stats_label):
 
     # include only the columns we want to plot
     df = df[df.columns[df.columns.isin(['delay'])]]
-    # print df
     return df
 
 
@@ -106,8 +130,8 @@ def filter_network_data(dataorigin, dataend, stats_label):
     # in milliseconds => nano/10^6 and rounded to two decimals
     delay_value = (helper(dataend, stats_label)['epoch'] - helper(dataorigin, stats_label)['epoch']) / precision_delay
     df['delay'] = numpy.round(delay_value, 2)
-    #print 'Delay Network  ' + stats_label, df[['delay']]
-   # print 'Delay Network  ' + stats_label, df
+    # print 'Delay Network  ' + stats_label, df[['delay']]
+    # print 'Delay Network  ' + stats_label, df
 
     # Add new columns in df1 to enable a fusioned max columns between lenghts
     df1['length origin'] = helper2(dataorigin)['length']
@@ -138,7 +162,7 @@ def filter_network_data(dataorigin, dataend, stats_label):
 # Eliminate the unnecessary data and format the values
 def helper(dfin, label):
     df = pandas.DataFrame(dfin[['frame.time_epoch', 'http.request.method']])
-    protocol =re.split(' ', label)[4]
+    protocol = re.split(' ', label)[4]
 
     # Drop columns with NAN values in Request Method i.e, non POST requests
     # if protocol == 'ul':
