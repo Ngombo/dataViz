@@ -2,9 +2,7 @@ import numpy
 import pandas
 import re
 import matplotlib.pyplot as plot;
-
-#from main import save_images
-from variables import box_colors2, box_colors, number_trials, root_url, sentReadings
+from variables import box_colors2, box_colors, number_trials, root_url, sentReadings, save_images
 
 plot.rcdefaults()
 
@@ -25,7 +23,7 @@ columns = ['client', 'trial', 'scope', 'protocol', 'feature', 'packet loss rate'
 def stats(df, label):
     # Declaration of variables
 
-    #print label
+    # print label
     trial = re.split(' ', label)[0]
     client = re.split(' ', label)[2]
     scope = re.split(' ', label)[3]
@@ -36,12 +34,11 @@ def stats(df, label):
 
     receivedReadings = len(df)
 
-
     if scope == 'end':
         # if (numpy.round((receivedReadings / float(sentReadings)) * 100, 2)) > 100:
         #     delivery_rate = 100 # To be stabilized in the proper version of the data collection
         # else:
-        loss_rate = numpy.round((1-(receivedReadings / float(sentReadings))) * 100, 2)
+        loss_rate = numpy.round((1 - (receivedReadings / float(sentReadings))) * 100, 2)
         # loss = numpy.round((1 - (receivedReadings / float(sentReadings))) * 100, 2)
 
     mean = numpy.round(df.mean(), 2)
@@ -79,8 +76,8 @@ def stats(df, label):
         dfstats_loss.append(
             [client, trial, scope, protocol, feature, loss_rate, mean, median, mode, total_bw])
         dfdelay = pandas.DataFrame(dfstats_loss, columns=columns)
-        #barplot(dfdelay, dfdelay, 'loss rate' , 'packet loss rate', "%", client)
-        barplot(dfdelay, dfdelay, 'Most Frequent Values of Delays', 'mode', "ms", client)
+        #barplot(dfdelay, dfdelay, 'loss rate', 'packet loss rate', "%", client)
+        barplot(dfdelay, dfdelay, scope+' '+feature+'.mode', 'mode', "ms", client)
 
     if scope == 'network' and feature == 'delay' and protocol == 'lw':
         dfstats_delay_net_lw.append(
@@ -181,14 +178,14 @@ def barplot(df1, df2, title, observed_values, ylabel, client):
     x1 = df1[observed_values].astype(float)
     x2 = df2[observed_values].astype(float)
     plot.bar(y_pos, x1, align='center', alpha=0.5, color=[colors[0], colors[1]])
-    #plot.bar(y_pos, x1, align='center', alpha=0.5, color=[colors[0], colors[1]])
+    # plot.bar(y_pos, x1, align='center', alpha=0.5, color=[colors[0], colors[1]])
     # plot.plot(y_pos, x1, "r--", label="UL")
     # plot.plot(y_pos, x2, "b:o", label="LWM2M")
     # plot.legend()
     plot.xticks(y_pos, objects)
     plot.xlabel('Sample Frequency (s)')
     plot.ylabel(ylabel)
-    plot.title(title)
+    #plot.title(title)
 
     # set individual bar labels above list
     for i, v in enumerate(x1):
@@ -196,7 +193,9 @@ def barplot(df1, df2, title, observed_values, ylabel, client):
 
     plot.xticks(rotation=70)
 
-    #save_images()
+    save_images(client, observed_values)
+
+
 
 def exportcsv(df, label, client, trial, scope, protocol, feature, delivery_rate, mean, median, mode, total):
     df.append([client, trial, scope, protocol, feature, mean, median, delivery_rate, mode, total])
